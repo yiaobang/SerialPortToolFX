@@ -16,7 +16,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Circle?>
 
-<AnchorPane fx:id="root" prefHeight="579.0" prefWidth="741.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.yiaoBang.serialPortToolFX.view.SerialPortView">
+<AnchorPane fx:id="root" prefHeight="579.0" prefWidth="741.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.yiaobang.serialPortToolFX.view.SerialPortView">
    <children>
       <AnchorPane layoutX="306.0" layoutY="164.0" prefHeight="34.0" prefWidth="717.0" styleClass="top" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
