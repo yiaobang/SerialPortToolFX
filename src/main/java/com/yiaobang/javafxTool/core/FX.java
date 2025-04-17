@@ -7,19 +7,19 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import lombok.NonNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.concurrent.atomic.AtomicReference;
 
 public final class FX {
     private FX() {
     }
-
     /**
      * 资源文件前缀(可由用户定义)
      */
-    public static String PREFIX = "/assets/";
+    private static final String PREFIX = "/com/yiaobang/serialportfx/";
 
     public static void run(Runnable runnable) {
         if (Platform.isFxApplicationThread()) {
@@ -109,26 +109,26 @@ public final class FX {
     public static Image image(String imageName) {
         return new Image(getResourceAsStream("images/" + imageName));
     }
+
     /**
      * 设置窗口拖拽
      *
-     * @param scene 现场
-     * @param stage 阶段
-     * @return {@code Stage }
+     * @param scene 场景
+     * @param stage 窗口
      */
-    public static Stage stageDrag(Scene scene, Stage stage) {
-        AtomicReference<Double> offsetX = new AtomicReference<>((double) 0);
-        AtomicReference<Double> offsetY = new AtomicReference<>((double) 0);
-        //设置拖动界面
+    public static void stageDrag(@NonNull Scene scene,@NonNull Stage stage) {
+        final double[] offsetX = {0};
+        final double[] offsetY = {0};
+
         scene.setOnMousePressed(event -> {
-            offsetX.set(event.getSceneX());
-            offsetY.set(event.getSceneY());
+            offsetX[0] = event.getSceneX();
+            offsetY[0] = event.getSceneY();
         });
+
         scene.setOnMouseDragged(event -> {
-            stage.setX(event.getScreenX() - offsetX.get());
-            stage.setY(event.getScreenY() - offsetY.get());
+            stage.setX(event.getScreenX() - offsetX[0]);
+            stage.setY(event.getScreenY() - offsetY[0]);
         });
-        return stage;
     }
 
     /**

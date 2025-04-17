@@ -1,22 +1,25 @@
 package com.yiaobang.serialPortToolFX.view;
 
 
+import com.yiaobang.javafxTool.core.FX;
 import com.yiaobang.javafxTool.mvvm.ViewFXML;
 import com.yiaobang.javafxTool.theme.Theme;
 import com.yiaobang.serialPortToolFX.serialComm.SerialComm;
 import com.yiaobang.serialPortToolFX.serialComm.SerialPortMonitor;
 import com.yiaobang.serialPortToolFX.utils.CodeFormat;
-import com.yiaobang.serialPortToolFX.utils.SerialPortStage;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
 import java.io.File;
@@ -24,6 +27,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import static com.yiaobang.serialPortToolFX.AppLauncher.FILE_CHOOSER;
+import static com.yiaobang.serialPortToolFX.AppLauncher.JAVAFX_BUILDER_FACTORY;
 
 
 public class SerialPortView extends ViewFXML<SerialComm> {
@@ -159,15 +163,18 @@ public class SerialPortView extends ViewFXML<SerialComm> {
     @FXML
     void createSerialPortStage() {
         Stage window = (Stage) root.getScene().getWindow();
-        SerialPortStage serialPortStage = SerialPortStage.create();
-        serialPortStage.getSerialPortView()
+        SerialPortView serialPortView = SerialPortView.createSerialPortView();
+        serialPortView
                 .initTheme(this.theme)
-                .initSerialPort(viewModel.getBaudRate(), viewModel.getDataBits(), viewModel.getStopSting(),
-                        viewModel.getParitySting(), viewModel.getFlowControlSting());
-
-        serialPortStage.getStage().setX(window.getX() + 100);
-        serialPortStage.getStage().setY(window.getY() + 100);
-        serialPortStage.getStage().show();
+                .initSerialPort(viewModel.getBaudRate(),
+                        viewModel.getDataBits(),
+                        viewModel.getStopSting(),
+                        viewModel.getParitySting(),
+                        viewModel.getFlowControlSting());
+        Stage stage = serialPortView.getStage();
+        stage.setX(window.getX() + 100);
+        stage.setY(window.getY() + 100);
+        stage.show();
     }
 
     /**
@@ -364,5 +371,21 @@ public class SerialPortView extends ViewFXML<SerialComm> {
         stopBitsPicker.setValue(stop);
         parityPicker.setValue(parity);
         flowControlPicker.setValue(flow);
+    }
+
+    public static SerialPortView createSerialPortView() {
+        Stage stage = new Stage(StageStyle.TRANSPARENT);
+        FXMLLoader loader = FX.fxmlLoader("serialPortView.fxml");
+        loader.setBuilderFactory(JAVAFX_BUILDER_FACTORY);
+        Scene scene = FX.loadScene(loader);
+        scene.setFill(Color.TRANSPARENT);
+        stage.setScene(scene);
+        stage.getIcons().add(FX.image("ico.png"));
+        FX.stageDrag(scene,stage);
+        return loader.getController();
+    }
+
+    public Stage getStage() {
+        return FX.getStage(this.root);
     }
 }

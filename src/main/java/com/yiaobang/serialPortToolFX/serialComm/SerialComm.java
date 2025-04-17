@@ -6,12 +6,11 @@ import com.yiaobang.javafxTool.core.FX;
 import com.yiaobang.javafxTool.mvvm.ViewModel;
 import com.yiaobang.serialPortToolFX.data.ByteBuffer;
 import com.yiaobang.serialPortToolFX.data.DataWriteFile;
-import com.yiaobang.serialPortToolFX.mockresponses.MockResponses;
+import com.yiaobang.serialPortToolFX.data.MockResponses;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleLongProperty;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.io.File;
 
 /**
@@ -23,28 +22,24 @@ import java.io.File;
 @Getter
 public final class SerialComm implements ViewModel, AutoCloseable {
 
-    //最多显示4096个接收到的字节(再多的话滚动条会出问题)
-    private static final int maxShowByteNumber = 4096;
-    private final ByteBuffer buffer = new ByteBuffer(maxShowByteNumber);
+    //最多显示4096个接收到的字节
+    private static final int MAX_SHOW_BYTES = 4096;
+    private final ByteBuffer buffer = new ByteBuffer(MAX_SHOW_BYTES);
     //模拟回复
     @Setter
     private MockResponses mockResponses;
     @Setter
     private volatile long waitTime = 1000;
     private DataWriteFile dataWriteFile;
-    /**
-     * 发送保存(写入本地文件)
-     */
+
+    //数据持久化
     @Setter
     private volatile boolean sendSave;
-
-    /**
-     * 接收保存(写入本地文件)
-     */
     @Setter
     private volatile boolean receiveSave;
     @Setter
     private volatile boolean receiveShow = false;
+
 
     //发送的数据量
     private final SimpleLongProperty SEND_LONG_PROPERTY = new SimpleLongProperty(0);
@@ -53,13 +48,14 @@ public final class SerialComm implements ViewModel, AutoCloseable {
     //串口状态
     private final SimpleBooleanProperty serialPortState = new SimpleBooleanProperty(false);
 
+    //常用的一些串口参数
     public static final Integer[] BAUD_RATE = {9600, 19200, 38400, 115200, 128000, 230400, 256000, 460800, 921600, 1382400};
     public static final Integer[] DATA_BITS = {8, 7, 6, 5};
     public static final String[] STOP_BITS = {"1", "1.5", "2"};
     public static final String[] PARITY = {"无", "奇校验", "偶校验", "标记校验", "空格校验"};
     public static final String[] FLOW_CONTROL = {"无", "RTS/CTS", "DSR/DTR", "XoN/XoFF"};
 
-
+    //设置串口默认参数
     private SerialPort serialPort;
     private String serialPortName;
     private int baudRate = 9600;
@@ -76,6 +72,7 @@ public final class SerialComm implements ViewModel, AutoCloseable {
     public SerialComm() {
         this.listener = new SerialCommDataListener(this);
     }
+
 
     /**
      * 查找串口

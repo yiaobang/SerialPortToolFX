@@ -23,11 +23,13 @@ public class DataWriteFile {
             dataFile.mkdirs();
         }
     }
+    //文件操作参数为 创建和追加
     private static final OpenOption[] options = {StandardOpenOption.CREATE, StandardOpenOption.APPEND};
     private final Path readFile;
     private final Path writeFile;
 
     public DataWriteFile(String serialPortName) {
+        //文件命中加入时间戳 以文件后缀来区分发送和接受
         File read = new File(dataFile, serialPortName + "-" + TimeUtils.getFileName() + ".read");
         File write = new File(dataFile, serialPortName + "-" + TimeUtils.getFileName() + ".write");
         read.delete();

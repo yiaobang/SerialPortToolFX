@@ -1,8 +1,7 @@
-package com.yiaobang.serialPortToolFX.mockresponses;
+package com.yiaobang.serialPortToolFX.data;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.yiaobang.serialPortToolFX.data.CircularArray;
 import com.yiaobang.serialPortToolFX.serialComm.SerialComm;
 import com.yiaobang.serialPortToolFX.utils.CodeFormat;
 import lombok.Setter;
@@ -23,8 +22,8 @@ import java.util.Map;
  */
 public abstract class MockResponses implements AutoCloseable {
     public static final Gson JSON = new Gson();
-    private static final Type type = new TypeToken<Map<String, String>>() {
-    }.getType();
+    private static final Type type = new TypeToken<Map<String, String>>() {}.getType();
+
     protected final Map<String, byte[]> replays;
     protected CircularArray dataBuffer = new CircularArray(4096);
     @Setter

@@ -2,7 +2,7 @@ package com.yiaobang.serialPortToolFX;
 
 import com.yiaobang.javafxTool.theme.Theme;
 import com.yiaobang.serialPortToolFX.serialComm.SerialPortMonitor;
-import com.yiaobang.serialPortToolFX.utils.SerialPortStage;
+import com.yiaobang.serialPortToolFX.view.SerialPortView;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.JavaFXBuilderFactory;
@@ -46,7 +46,7 @@ public class AppLauncher extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-      SerialPortStage.create().getStage().show();
+        SerialPortView.createSerialPortView().getStage().show();
     }
 
     @Override

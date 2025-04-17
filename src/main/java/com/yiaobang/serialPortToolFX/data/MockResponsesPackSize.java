@@ -1,4 +1,4 @@
-package com.yiaobang.serialPortToolFX.mockresponses;
+package com.yiaobang.serialPortToolFX.data;
 
 import java.util.Map;
 
