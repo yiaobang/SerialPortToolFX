@@ -2,7 +2,7 @@ package com.yiaobang.serialPortToolFX.serialComm;
 
 import com.fazecast.jSerialComm.SerialPort;
 import com.fazecast.jSerialComm.SerialPortDataListener;
-import com.yiaobang.javafxTool.core.FX;
+import com.yiaobang.javafxTool.FX;
 import com.yiaobang.javafxTool.mvvm.ViewModel;
 import com.yiaobang.serialPortToolFX.data.ByteBuffer;
 import com.yiaobang.serialPortToolFX.data.DataWriteFile;

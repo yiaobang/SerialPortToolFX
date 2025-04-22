@@ -1,7 +1,7 @@
 package com.yiaobang.serialPortToolFX.view;
 
 
-import com.yiaobang.javafxTool.core.FX;
+import com.yiaobang.javafxTool.FX;
 import com.yiaobang.javafxTool.mvvm.ViewFXML;
 import com.yiaobang.javafxTool.theme.Theme;
 import com.yiaobang.serialPortToolFX.serialComm.SerialComm;
