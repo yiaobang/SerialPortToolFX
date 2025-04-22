@@ -1,4 +1,4 @@
-package com.yiaobang.javafxTool;
+package com.yiaobang.javafxTool.core;
 
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
