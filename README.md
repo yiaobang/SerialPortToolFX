@@ -1,6 +1,6 @@
 # SerialPortToolFX
 
-- [**日本語(Copilotを使用して翻訳する)**](README_JP.md) | [**English(Use Copilot to translate)**](README.md)
+- [**日本語(Copilotを使用して翻訳する)**](README_JP.md) | [**English(Use Copilot to translate)**](README_EN.md)
 
 ## 概述
 
