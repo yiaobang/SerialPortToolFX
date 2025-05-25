@@ -350,6 +350,12 @@ public class SerialPortView extends ViewFXML<SerialComm> {
         });
     }
 
+    /**
+     * 初始化主题
+     *
+     * @param theme 主题
+     * @return {@link SerialPortView }
+     */
     public SerialPortView initTheme(int theme) {
         this.theme = theme;
         switchTheme();
@@ -357,7 +363,7 @@ public class SerialPortView extends ViewFXML<SerialComm> {
     }
 
     /**
-     * 在创建窗口后设置串口的参数
+     * 在创建窗口后设置串口的参数(便于拷贝当前串口参数)
      *
      * @param baudRate 波特率
      * @param dateBits 数据位
@@ -373,6 +379,12 @@ public class SerialPortView extends ViewFXML<SerialComm> {
         flowControlPicker.setValue(flow);
     }
 
+
+    /**
+     * 创建串口调试窗口
+     *
+     * @return {@link SerialPortView }
+     */
     public static SerialPortView createSerialPortView() {
         Stage stage = new Stage(StageStyle.TRANSPARENT);
         FXMLLoader loader = FX.fxmlLoader("serialPortView.fxml");
