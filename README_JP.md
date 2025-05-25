@@ -115,7 +115,7 @@ SerialPortToolFX は、JavaFX を使用して構築されたクロスプラッ�
    
    ## コンパイルとパッケージ
    
-   ### 环境要求
+   ### 環境要件
    
    - java22+
    - Gradle（対応する Java バージョン）
