@@ -1,4 +1,4 @@
-package com.yiaobang.javafxTool.mvvm;
+package com.yiaobang.serialPortToolFX.javafxTool.mvvm;
 
 import javafx.fxml.Initializable;
 import java.net.URL;

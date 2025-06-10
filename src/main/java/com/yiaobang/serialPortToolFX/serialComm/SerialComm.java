@@ -2,8 +2,8 @@ package com.yiaobang.serialPortToolFX.serialComm;
 
 import com.fazecast.jSerialComm.SerialPort;
 import com.fazecast.jSerialComm.SerialPortDataListener;
-import com.yiaobang.javafxTool.core.FX;
-import com.yiaobang.javafxTool.mvvm.ViewModel;
+import com.yiaobang.serialPortToolFX.javafxTool.core.FX;
+import com.yiaobang.serialPortToolFX.javafxTool.mvvm.ViewModel;
 import com.yiaobang.serialPortToolFX.data.ByteBuffer;
 import com.yiaobang.serialPortToolFX.data.DataWriteFile;
 import com.yiaobang.serialPortToolFX.data.MockResponses;
@@ -22,8 +22,8 @@ import java.io.File;
 @Getter
 public final class SerialComm implements ViewModel, AutoCloseable {
 
-    //最多显示4096个接收到的字节
-    private static final int MAX_SHOW_BYTES = 4096;
+    //最多显示115200个接收到的字节
+    private static final int MAX_SHOW_BYTES = 115200;
     private final ByteBuffer buffer = new ByteBuffer(MAX_SHOW_BYTES);
     //模拟回复
     @Setter
@@ -37,8 +37,9 @@ public final class SerialComm implements ViewModel, AutoCloseable {
     private volatile boolean sendSave;
     @Setter
     private volatile boolean receiveSave;
+    //是否显示接收数据(默认显示)
     @Setter
-    private volatile boolean receiveShow = false;
+    private volatile boolean receiveShow = true;
 
 
     //发送的数据量

@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'com.yiaobang'
-version = '1.0.3'
+version = '1.1.0'
 
 java {
     toolchain {
@@ -16,13 +16,13 @@ java {
 
 repositories {
     mavenLocal()
-    maven { url= 'https://maven.aliyun.com/repository/public/' }
+    maven { url = 'https://maven.aliyun.com/repository/public/' }
     mavenCentral()
     maven { url = 'https://jitpack.io' }
 }
 
 javafx {
-    version = '24'
+    version = '24.0.1'
     modules = ['javafx.controls', 'javafx.fxml']
 }
 
@@ -35,9 +35,9 @@ dependencies {
 
 
     implementation 'com.fazecast:jSerialComm:2.11.0'
-    implementation 'org.apache.commons:commons-text:1.13.0'
+    implementation 'org.apache.commons:commons-text:1.13.1'
     implementation 'commons-codec:commons-codec:1.18.0'
-    implementation 'com.google.code.gson:gson:2.12.1'
+    implementation 'com.google.code.gson:gson:2.13.1'
 
     testImplementation platform('org.junit:junit-bom:5.12.1')
     testImplementation 'org.junit.jupiter:junit-jupiter'
@@ -67,25 +67,52 @@ jlink {
         name = application.applicationName + version
         imageName.set(application.applicationName)
     }
-    imageZip.set(project.file('${project.getLayout().getBuildDirectory().get()}/image-zip/JavaFXSample.zip'))
+    imageZip.set(project.layout.buildDirectory.file("image-zip/SerialPortToolFX.zip"))
 
     jpackage {
         outputDir = 'jpackage'
         imageName = application.applicationName + "-" + version
-        skipInstaller = false
         installerName = application.applicationName + "-" + version
         appVersion = version.toString()
-        if (org.gradle.internal.os.OperatingSystem.current().windows) {
+        vendor = "yiaobang"
+        description = "A practical serial port utility built with JavaFX."
+
+        // 是否跳过创建安装包（可根据需求设为 true/false）
+        skipInstaller = true
+
+        // --- 平台特定配置 ---
+        def os = org.gradle.internal.os.OperatingSystem.current()
+        if (os.isWindows()) {
             icon = 'src/main/resources/application.ico'
-            installerOptions += ['--win-dir-chooser', '--win-menu', '--win-shortcut', '--win-menu-group', application.applicationName]
+            installerOptions.addAll([
+                    '--win-dir-chooser',           // 允许用户选择安装目录
+                    '--win-menu',                  // 在开始菜单创建快捷方式
+                    '--win-shortcut',              // 在桌面创建快捷方式
+                    '--win-menu-group', application.applicationName, // 菜单组名
+                    '--win-upgrade-uuid', 'c1f5e3a8-6f4a-4c2a-9c95-8d3c7345b91e', // 升级唯一标识
+                    '--win-shortcut-prompt',       // 提示是否创建快捷方式
+                    '--win-help-url', 'https://github.com/yiaobang/SerialPortToolFX' // 帮助链接
+            ])
         }
-        if (org.gradle.internal.os.OperatingSystem.current().macOsX) {
-            icon = 'src/main/resources/application.icons'
+        if (os.isMacOsX()) {
+            icon = 'src/main/resources/ico.icns'
+            installerOptions.addAll([
+                    '--mac-package-identifier', 'com.yiaobang.serialPortToolFX' // 应用包标识符
+            ])
         }
-        if (org.gradle.internal.os.OperatingSystem.current().linux) {
-            icon = 'src/main/resources/application.png'
+        if (os.isLinux()) {
+            icon = 'src/main/resources/ico.png'
             installerType = 'deb'
-            installerOptions += ['--linux-deb-maintainer', 'icuxika@outlook.com', '--linux-menu-group', application.applicationName, '--linux-shortcut']
+            installerOptions.addAll([
+                    '--linux-deb-maintainer', 'yiaobang@gmail.com', // 维护者信息
+                    '--linux-menu-group', application.applicationName, // 菜单组名
+                    '--linux-shortcut', // 创建桌面快捷方式
+                    '--linux-app-category', 'Utility', // 应用类别
+                    '--linux-description', 'A practical serial port utility built with JavaFX.', // 应用描述
+                    '--linux-url', 'https://github.com/yiaobang/SerialPortToolFX', // 应用主页
+                    '--linux-bundle-name', 'serialPortToolFX' // 安装包名
+            ])
         }
+
     }
 }

@@ -1,4 +1,4 @@
-package com.yiaobang.javafxTool.core;
+package com.yiaobang.serialPortToolFX.javafxTool.core;
 
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;

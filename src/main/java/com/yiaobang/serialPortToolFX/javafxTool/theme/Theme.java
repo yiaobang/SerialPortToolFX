@@ -1,4 +1,4 @@
-package com.yiaobang.javafxTool.theme;
+package com.yiaobang.serialPortToolFX.javafxTool.theme;
 
 public enum Theme {
     CUPERTINO_LIGHT("/atlantafx/base/theme/cupertino-light.css"),

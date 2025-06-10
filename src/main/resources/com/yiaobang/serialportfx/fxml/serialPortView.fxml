@@ -73,7 +73,7 @@
    <Button layoutX="636.0" layoutY="316.0" mnemonicParsing="false" onAction="#cleanReceive" prefHeight="35.0" prefWidth="87.0" text="清除接收" />
    <Button layoutX="524.0" layoutY="408.0" mnemonicParsing="false" onAction="#sendData" prefHeight="35.0" prefWidth="87.0" text="发送数据" />
    <Button layoutX="636.0" layoutY="408.0" mnemonicParsing="false" onAction="#cleanSend" prefHeight="35.0" prefWidth="87.0" text="清除发送" />
-   <CheckBox fx:id="receiveShow" layoutX="524.0" layoutY="363.0" mnemonicParsing="false" prefHeight="29.0" prefWidth="87.0" text="接收显示" />
+   <CheckBox fx:id="receiveShow" layoutX="524.0" layoutY="363.0" mnemonicParsing="false" prefHeight="29.0" prefWidth="87.0" selected="true" text="接收显示" />
    <Circle fx:id="serialPortLight" fill="#ff1f1f" layoutX="531.0" layoutY="334.0" radius="6.0" stroke="BLACK" strokeType="INSIDE" />
    <Button layoutX="524.0" layoutY="454.0" mnemonicParsing="false" onAction="#createSerialPortStage" prefHeight="35.0" prefWidth="87.0" text="新建窗口" />
    <Button layoutX="636.0" layoutY="454.0" mnemonicParsing="false" onAction="#analogReply" prefHeight="35.0" prefWidth="87.0" text="模拟回复" />
