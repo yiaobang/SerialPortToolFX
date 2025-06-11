@@ -55,13 +55,7 @@ jobs:
           # github.ref_name 会自动获取到标签名称，例如 'v1.0.0'
           zip -r ../../packaged-app-${{ github.ref_name }}-${{ matrix.os }}.zip .
           cd ../..
-      - name: Wait for filesystem to settle
-        run: sleep 10
-      - name: Sync filesystem
-        if: runner.os != 'Windows'
-        run: sync
-      - name: Check packaged file
-        run: ls -lh packaged-app-*
+
       - name: Upload packaged artifact
         uses: actions/upload-artifact@v4
         with:
