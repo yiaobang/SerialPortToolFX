@@ -264,6 +264,7 @@ public class SerialPortView extends ViewFXML<SerialComm> {
         //串口号列表周期刷新
         serialPortNamePicker.itemsProperty().bind(Bindings.createObjectBinding(() -> FXCollections.observableArrayList(SerialPortMonitor.serialPorts.get().split("\n")), SerialPortMonitor.serialPorts));
 
+
         //添加参数列表数据
         baudRatePicker.getItems().addAll(SerialComm.BAUD_RATE);
         dataBitsPicker.getItems().addAll(SerialComm.DATA_BITS);

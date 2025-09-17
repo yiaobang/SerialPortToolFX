@@ -1,8 +1,9 @@
 plugins {
     id 'java'
     id('application')
+    id('org.javamodularity.moduleplugin') version '1.8.15'
     id('org.openjfx.javafxplugin') version '0.1.0'
-    id('org.beryx.jlink') version '3.1.1'
+    id('org.beryx.jlink') version '3.1.3'
 }
 
 group = 'com.yiaobang'
@@ -10,7 +11,7 @@ version = '1.1.0'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(24)
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }
 
@@ -34,9 +35,9 @@ dependencies {
     implementation 'io.github.mkpaz:atlantafx-base:2.0.1'
 
 
-    implementation 'com.fazecast:jSerialComm:2.11.0'
-    implementation 'org.apache.commons:commons-text:1.13.1'
-    implementation 'commons-codec:commons-codec:1.18.0'
+    implementation 'com.fazecast:jSerialComm:2.11.2'
+    implementation 'org.apache.commons:commons-text:1.14.0'
+    implementation 'commons-codec:commons-codec:1.19.0'
     implementation 'com.google.code.gson:gson:2.13.1'
 
     testImplementation platform('org.junit:junit-bom:5.12.1')
@@ -78,7 +79,7 @@ jlink {
         description = "A practical serial port utility built with JavaFX."
 
         // 是否跳过创建安装包（可根据需求设为 true/false）
-        skipInstaller = true
+        skipInstaller = false
 
         // --- 平台特定配置 ---
         def os = org.gradle.internal.os.OperatingSystem.current()
