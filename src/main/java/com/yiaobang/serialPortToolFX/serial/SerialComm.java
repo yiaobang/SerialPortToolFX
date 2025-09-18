@@ -1,12 +1,12 @@
-package com.yiaobang.serialPortToolFX.serialComm;
+package com.yiaobang.serialporttoolfx.serial;
 
 import com.fazecast.jSerialComm.SerialPort;
 import com.fazecast.jSerialComm.SerialPortDataListener;
-import com.yiaobang.serialPortToolFX.javafxTool.core.FX;
-import com.yiaobang.serialPortToolFX.javafxTool.mvvm.ViewModel;
-import com.yiaobang.serialPortToolFX.data.ByteBuffer;
-import com.yiaobang.serialPortToolFX.data.DataWriteFile;
-import com.yiaobang.serialPortToolFX.data.MockResponses;
+import com.yiaobang.serialporttoolfx.framework.core.FX;
+import com.yiaobang.serialporttoolfx.framework.mvvm.ViewModel;
+import com.yiaobang.serialporttoolfx.model.ByteBuffer;
+import com.yiaobang.serialporttoolfx.model.DataWriteFile;
+import com.yiaobang.serialporttoolfx.model.DeviceSimulator;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleLongProperty;
 import lombok.Getter;
@@ -25,9 +25,9 @@ public final class SerialComm implements ViewModel, AutoCloseable {
     //最多显示115200个接收到的字节
     private static final int MAX_SHOW_BYTES = 115200;
     private final ByteBuffer buffer = new ByteBuffer(MAX_SHOW_BYTES);
-    //模拟回复
+    //设备模拟器
     @Setter
-    private MockResponses mockResponses;
+    private DeviceSimulator deviceSimulator;
     @Setter
     private volatile long waitTime = 1000;
     private DataWriteFile dataWriteFile;
@@ -40,7 +40,6 @@ public final class SerialComm implements ViewModel, AutoCloseable {
     //是否显示接收数据(默认显示)
     @Setter
     private volatile boolean receiveShow = true;
-
 
     //发送的数据量
     private final SimpleLongProperty SEND_LONG_PROPERTY = new SimpleLongProperty(0);
@@ -62,48 +61,66 @@ public final class SerialComm implements ViewModel, AutoCloseable {
     private int baudRate = 9600;
     private int dataBits = 8;
     private int stopBits = 1;
-    private String stopSting = "1";
+    private String stopString = "1";
     private int parity = 0;
-    private String paritySting = "无";
+    private String parityString = "无";
     private int flowControl = 0;
-    private String flowControlSting = "无";
+    private String flowControlString = "无";
     private final SerialPortDataListener listener;
 
-
     public SerialComm() {
-        this.listener = new SerialCommDataListener(this);
+        this.listener = new SerialDataListener(this);
     }
-
 
     /**
      * 查找串口
      */
-    public void findSerialPort() {
-        close();
+    private SerialPort findSerialPort() {
         for (SerialPort serial : SerialPort.getCommPorts()) {
             if (serial.getSystemPortName().equals(serialPortName)) {
-                serialPort = serial;
-                return;
+                return serial;
             }
         }
-        serialPort = null;
+        return null;
+    }
+
+    /**
+     * 配置串口参数
+     */
+    private void configurePort(SerialPort port) {
+        port.setComPortParameters(baudRate, dataBits, stopBits, parity);
+        port.setFlowControl(flowControl);
+    }
+
+    /**
+     * 添加监听器
+     */
+    private void attachListeners(SerialPort port) {
+        port.addDataListener(this.listener);
+    }
+
+    /**
+     * 更新端口状态
+     */
+    private void updatePortState(boolean isOpen, SerialPort port) {
+        dataWriteFile = isOpen ? new DataWriteFile(serialPortName) : null;
+        FX.run(() -> serialPortState.set(isOpen));
     }
 
     /**
      * 打开串口
      */
     public void openSerialPort() {
-        findSerialPort();
+        close();
+        serialPort = findSerialPort();
         if (serialPort == null) {
             FX.run(() -> serialPortState.set(false));
             return;
         }
-        serialPort.setComPortParameters(baudRate, dataBits, stopBits, parity);
-        serialPort.setFlowControl(flowControl);
-        serialPort.addDataListener(this.listener);
-        boolean b = serialPort.openPort();
-        dataWriteFile = b ? new DataWriteFile(serialPortName) : null;
-        FX.run(() -> serialPortState.set(b));
+        configurePort(serialPort);
+        attachListeners(serialPort);
+        boolean isOpen = serialPort.openPort();
+        updatePortState(isOpen, serialPort);
     }
 
     /**
@@ -117,7 +134,7 @@ public final class SerialComm implements ViewModel, AutoCloseable {
             int sendNumber = serialPort.writeBytes(bytes, bytes.length);
             if (sendNumber > 0) {
                 FX.run(() -> SEND_LONG_PROPERTY.set(SEND_LONG_PROPERTY.get() + sendNumber));
-                if (sendSave) Thread.startVirtualThread(() -> dataWriteFile.serialCommSend(bytes));
+                if (sendSave && dataWriteFile != null) Thread.startVirtualThread(() -> dataWriteFile.serialCommSend(bytes));
             } else {
                 this.close();
             }
@@ -135,12 +152,12 @@ public final class SerialComm implements ViewModel, AutoCloseable {
         //计数
         FX.run(() -> RECEIVE_LONG_PROPERTY.set(RECEIVE_LONG_PROPERTY.get() + bytes.length));
         //写入本地文件
-        if (receiveSave) Thread.startVirtualThread(() -> dataWriteFile.serialCommReceive(bytes));
+        if (receiveSave && dataWriteFile != null) Thread.startVirtualThread(() -> dataWriteFile.serialCommReceive(bytes));
         //缓存
         if (receiveShow) buffer.add(bytes);
-        //模拟回复
-        if (mockResponses != null) {
-            mockResponses.checkData(bytes);
+        //设备模拟
+        if (deviceSimulator != null) {
+            deviceSimulator.checkData(bytes);
         }
     }
 
@@ -203,7 +220,7 @@ public final class SerialComm implements ViewModel, AutoCloseable {
      * @param stopBits 停止位
      */
     public void setStopBits(String stopBits) {
-        this.stopSting = stopBits;
+        this.stopString = stopBits;
         this.stopBits = switch (stopBits) {
             case "1.5" -> SerialPort.ONE_POINT_FIVE_STOP_BITS;
             case "2" -> SerialPort.TWO_STOP_BITS;
@@ -218,7 +235,7 @@ public final class SerialComm implements ViewModel, AutoCloseable {
      * @param parity 平价
      */
     public void setParity(String parity) {
-        this.paritySting = parity;
+        this.parityString = parity;
         this.parity = switch (parity) {
             case "奇校验" -> SerialPort.ODD_PARITY;
             case "偶校验" -> SerialPort.EVEN_PARITY;
@@ -235,7 +252,7 @@ public final class SerialComm implements ViewModel, AutoCloseable {
      * @param flowControl 流控制
      */
     public void setFlowControl(String flowControl) {
-        this.flowControlSting = flowControl;
+        this.flowControlString = flowControl;
         this.flowControl = switch (flowControl) {
             case "RTS/CTS" -> SerialPort.FLOW_CONTROL_RTS_ENABLED | SerialPort.FLOW_CONTROL_CTS_ENABLED;
             case "DSR/DTR" -> SerialPort.FLOW_CONTROL_DSR_ENABLED | SerialPort.FLOW_CONTROL_DTR_ENABLED;
@@ -245,20 +262,22 @@ public final class SerialComm implements ViewModel, AutoCloseable {
         openSerialPort();
     }
 
-    public boolean createMockResponses(File file) {
-        if (this.mockResponses != null) {
-            this.mockResponses.close();
-            this.mockResponses = null;
+    public boolean createDeviceSimulator(File file) {
+        if (this.deviceSimulator != null) {
+            this.deviceSimulator.close();
+            this.deviceSimulator = null;
         }
         if (file == null) {
             return false;
         }
-        this.mockResponses = MockResponses.createMockResponses(file);
-        if (this.mockResponses != null) {
-            mockResponses.setSerialComm(this);
+        this.deviceSimulator = DeviceSimulator.createDeviceSimulator(file);
+        if (this.deviceSimulator != null) {
+            deviceSimulator.setSerialComm(this);
         }
-        return this.mockResponses != null;
+        return this.deviceSimulator != null;
     }
+
+
 
     /**
      * 关闭

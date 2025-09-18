@@ -1,12 +1,12 @@
-package com.yiaobang.serialPortToolFX.view;
+package com.yiaobang.serialporttoolfx.view;
 
-
-import com.yiaobang.serialPortToolFX.javafxTool.core.FX;
-import com.yiaobang.serialPortToolFX.javafxTool.mvvm.ViewFXML;
-import com.yiaobang.serialPortToolFX.javafxTool.theme.Theme;
-import com.yiaobang.serialPortToolFX.serialComm.SerialComm;
-import com.yiaobang.serialPortToolFX.serialComm.SerialPortMonitor;
-import com.yiaobang.serialPortToolFX.utils.CodeFormat;
+import com.yiaobang.serialporttoolfx.framework.core.FX;
+import com.yiaobang.serialporttoolfx.framework.mvvm.ViewFXML;
+import com.yiaobang.serialporttoolfx.framework.theme.Theme;
+import com.yiaobang.serialporttoolfx.serial.SerialComm;
+import com.yiaobang.serialporttoolfx.serial.PortMonitor;
+import com.yiaobang.serialporttoolfx.utils.CodeFormat;
+import com.yiaobang.serialporttoolfx.utils.I18nUtils;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.binding.Bindings;
@@ -24,12 +24,18 @@ import javafx.util.Duration;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
-import static com.yiaobang.serialPortToolFX.AppLauncher.FILE_CHOOSER;
-import static com.yiaobang.serialPortToolFX.AppLauncher.JAVAFX_BUILDER_FACTORY;
+import static com.yiaobang.serialporttoolfx.AppLauncher.FILE_CHOOSER;
+import static com.yiaobang.serialporttoolfx.AppLauncher.JAVAFX_BUILDER_FACTORY;
 
-
+/**
+ * 串口视图
+ *
+ * @author Y
+ * @date 2024/05/14
+ */
 public class SerialPortView extends ViewFXML<SerialComm> {
     /**
      * 循环发送
@@ -38,6 +44,7 @@ public class SerialPortView extends ViewFXML<SerialComm> {
     private volatile long waitTime = 1000;
     private volatile byte[] bytes;
     private volatile int theme = 0;
+    
     @FXML
     private AnchorPane root;
     //串口名称选择器
@@ -97,9 +104,43 @@ public class SerialPortView extends ViewFXML<SerialComm> {
     //串口开关
     @FXML
     private Button serialPortSwitch;
-    //模拟回复的指示灯
+    //设备模拟的指示灯
     @FXML
     private Circle analogLight;
+    
+    // 按钮引用
+    @FXML
+    private Button clearReceiveBtn;
+    @FXML
+    private Button sendDataBtn;
+    @FXML
+    private Button clearSendBtn;
+    @FXML
+    private Button newWindowBtn;
+    @FXML
+    private Button analogReplyBtn;
+    
+    // 标签引用
+    @FXML
+    private Label sendLabel;
+    @FXML
+    private Label receiveLabel;
+    @FXML
+    private Label frequencyLabel;
+    @FXML
+    private Label msLabel;
+    @FXML
+    private Label serialPortLabel;
+    @FXML
+    private Label baudRateLabel;
+    @FXML
+    private Label dataBitsLabel;
+    @FXML
+    private Label stopBitsLabel;
+    @FXML
+    private Label parityLabel;
+    @FXML
+    private Label flowControlLabel;
 
     /**
      * 创建视图模型
@@ -129,15 +170,15 @@ public class SerialPortView extends ViewFXML<SerialComm> {
     }
 
     /**
-     * 加载json文件用于在收到串口消息后进行模拟回复
+     * 加载json文件用于在收到串口消息后进行设备模拟
      * 当json文件加载成功时 指示灯变为绿色
      * 当json文件记载失败时 指示灯变为红色
      */
     @FXML
     void analogReply() {
         File file = FILE_CHOOSER.showOpenDialog(root.getScene().getWindow());
-        boolean mockResponses = viewModel.createMockResponses(file);
-        analogLight.setFill(mockResponses ? Color.LIME : Color.RED);
+        boolean deviceSimulator = viewModel.createDeviceSimulator(file);
+        analogLight.setFill(deviceSimulator ? Color.LIME : Color.RED);
     }
 
     /**
@@ -168,9 +209,11 @@ public class SerialPortView extends ViewFXML<SerialComm> {
                 .initTheme(this.theme)
                 .initSerialPort(viewModel.getBaudRate(),
                         viewModel.getDataBits(),
-                        viewModel.getStopSting(),
-                        viewModel.getParitySting(),
-                        viewModel.getFlowControlSting());
+                        viewModel.getStopString(),
+                        viewModel.getParityString(),
+                        viewModel.getFlowControlString());
+        // 更新新窗口的语言
+        serialPortView.updateUITexts();
         Stage stage = serialPortView.getStage();
         stage.setX(window.getX() + 100);
         stage.setY(window.getY() + 100);
@@ -216,6 +259,64 @@ public class SerialPortView extends ViewFXML<SerialComm> {
     }
 
     /**
+     * 切换语言
+     */
+    @FXML
+    void switchLanguage() {
+        Locale[] locales = I18nUtils.getSupportedLocales();
+        Locale current = I18nUtils.getCurrentLocale();
+        int currentIndex = 0;
+        for (int i = 0; i < locales.length; i++) {
+            if (locales[i].equals(current)) {
+                currentIndex = i;
+                break;
+            }
+        }
+        int nextIndex = (currentIndex + 1) % locales.length;
+        I18nUtils.setLocale(locales[nextIndex]);
+        updateUITexts();
+    }
+
+    /**
+     * 更新所有UI文本
+     */
+    public void updateUITexts() {
+        // 更新串口开关按钮
+        serialPortSwitch.textProperty().unbind();
+        serialPortSwitch.textProperty().bind(viewModel.getSerialPortState().map(state -> 
+            state ? I18nUtils.getString("button.close_serial_port") : I18nUtils.getString("button.open_serial_port")));
+        
+        // 更新复选框
+        receiveShow.setText(I18nUtils.getString("checkbox.receive_display"));
+        receiveSave.setText(I18nUtils.getString("checkbox.record_receive_data"));
+        sendSave.setText(I18nUtils.getString("checkbox.record_send_data"));
+        timedDispatch.setText(I18nUtils.getString("checkbox.loop_send"));
+        hexSend.setText(I18nUtils.getString("checkbox.hex_send"));
+        hexReceive.setText(I18nUtils.getString("checkbox.hex_display"));
+        
+        // 更新按钮
+        clearReceiveBtn.setText(I18nUtils.getString("button.clear_receive"));
+        sendDataBtn.setText(I18nUtils.getString("button.send_data"));
+        clearSendBtn.setText(I18nUtils.getString("button.clear_send"));
+        newWindowBtn.setText(I18nUtils.getString("button.new_window"));
+        analogReplyBtn.setText(I18nUtils.getString("button.analog_reply"));
+        
+        // 更新标签
+        sendLabel.setText(I18nUtils.getString("label.send") + ":");
+        receiveLabel.setText(I18nUtils.getString("label.receive") + ":");
+        frequencyLabel.setText(I18nUtils.getString("label.frequency"));
+        msLabel.setText(I18nUtils.getString("label.ms_per_time"));
+        
+        // 更新参数标签
+        serialPortLabel.setText(I18nUtils.getString("label.serial_port_number"));
+        baudRateLabel.setText(I18nUtils.getString("label.baud_rate"));
+        dataBitsLabel.setText(I18nUtils.getString("label.data_bits"));
+        stopBitsLabel.setText(I18nUtils.getString("label.stop_bits"));
+        parityLabel.setText(I18nUtils.getString("label.parity"));
+        flowControlLabel.setText(I18nUtils.getString("label.flow_control"));
+    }
+
+    /**
      * 切换主题
      */
     @FXML
@@ -231,39 +332,36 @@ public class SerialPortView extends ViewFXML<SerialComm> {
         //无限循环发送
         circularSending.setCycleCount(Timeline.INDEFINITE);
         //接收保存的开关
-        receiveSave.selectedProperty().addListener((_, _, newValue) -> viewModel.setReceiveSave(newValue));
+        receiveSave.selectedProperty().addListener((observable, oldValue, newValue) -> viewModel.setReceiveSave(newValue));
         //发送保存的开关
-        sendSave.selectedProperty().addListener((_, _, newValue) -> viewModel.setSendSave(newValue));
+        sendSave.selectedProperty().addListener((observable, oldValue, newValue) -> viewModel.setSendSave(newValue));
         //计数绑定
         sendNumber.textProperty().bind(viewModel.getSEND_LONG_PROPERTY().asString());
         receiveNumber.textProperty().bind(viewModel.getRECEIVE_LONG_PROPERTY().asString());
 
-
         //串口开关绑定
-        serialPortSwitch.textProperty().bind(viewModel.getSerialPortState().map(state -> state ? "关闭串口" : "打开串口"));
+        serialPortSwitch.textProperty().bind(viewModel.getSerialPortState().map(state -> 
+            state ? I18nUtils.getString("button.close_serial_port") : I18nUtils.getString("button.open_serial_port")));
         //串口指示灯绑定
         serialPortLight.fillProperty().bind(viewModel.getSerialPortState().map(state -> state ? Color.LIME : Color.RED));
 
         //初始化列表
         baudRatePicker.setValue(viewModel.getBaudRate());
         dataBitsPicker.setValue(viewModel.getDataBits());
-        stopBitsPicker.setValue(viewModel.getStopSting());
-        parityPicker.setValue(viewModel.getParitySting());
-        flowControlPicker.setValue(viewModel.getFlowControlSting());
-
+        stopBitsPicker.setValue(viewModel.getStopString());
+        parityPicker.setValue(viewModel.getParityString());
+        flowControlPicker.setValue(viewModel.getFlowControlString());
 
         //串口参数更新
-        serialPortNamePicker.valueProperty().addListener((_, _, newValue) -> viewModel.setSerialPortName(newValue));
-        baudRatePicker.valueProperty().addListener((_, _, newValue) -> viewModel.setBaudRate(newValue));
-        dataBitsPicker.valueProperty().addListener((_, _, newValue) -> viewModel.setDataBits(newValue));
-        stopBitsPicker.valueProperty().addListener((_, _, newValue) -> viewModel.setStopBits(newValue));
-        parityPicker.valueProperty().addListener((_, _, newValue) -> viewModel.setParity(newValue));
-        flowControlPicker.valueProperty().addListener((_, _, newValue) -> viewModel.setFlowControl(newValue));
-
+        serialPortNamePicker.valueProperty().addListener((observable, oldValue, newValue) -> viewModel.setSerialPortName(newValue));
+        baudRatePicker.valueProperty().addListener((observable, oldValue, newValue) -> viewModel.setBaudRate(newValue));
+        dataBitsPicker.valueProperty().addListener((observable, oldValue, newValue) -> viewModel.setDataBits(newValue));
+        stopBitsPicker.valueProperty().addListener((observable, oldValue, newValue) -> viewModel.setStopBits(newValue));
+        parityPicker.valueProperty().addListener((observable, oldValue, newValue) -> viewModel.setParity(newValue));
+        flowControlPicker.valueProperty().addListener((observable, oldValue, newValue) -> viewModel.setFlowControl(newValue));
 
         //串口号列表周期刷新
-        serialPortNamePicker.itemsProperty().bind(Bindings.createObjectBinding(() -> FXCollections.observableArrayList(SerialPortMonitor.serialPorts.get().split("\n")), SerialPortMonitor.serialPorts));
-
+        serialPortNamePicker.itemsProperty().bind(Bindings.createObjectBinding(() -> FXCollections.observableArrayList(PortMonitor.serialPorts.get().split("\n")), PortMonitor.serialPorts));
 
         //添加参数列表数据
         baudRatePicker.getItems().addAll(SerialComm.BAUD_RATE);
@@ -274,7 +372,7 @@ public class SerialPortView extends ViewFXML<SerialComm> {
         serialPortNamePicker.setValue(serialPortNamePicker.getItems().isEmpty() ? "" : serialPortNamePicker.getItems().getFirst());
 
         //循环发送的等待时间(ms)
-        time.textProperty().addListener((_, oldValue, newValue) -> {
+        time.textProperty().addListener((observable, oldValue, newValue) -> {
             try {
                 waitTime = Integer.parseInt(newValue);
                 if (waitTime < 1) {
@@ -287,10 +385,10 @@ public class SerialPortView extends ViewFXML<SerialComm> {
         });
 
         //定时发送开关
-        timedDispatch.selectedProperty().addListener((_, _, newValue) -> {
+        timedDispatch.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
                 circularSending.getKeyFrames().clear();
-                circularSending.getKeyFrames().add(new KeyFrame(Duration.millis(waitTime), _ -> {
+                circularSending.getKeyFrames().add(new KeyFrame(Duration.millis(waitTime), event -> {
                     if (viewModel.write(bytes) < 1) {
                         circularSending.stop();
                         timedDispatch.setSelected(false);
@@ -302,32 +400,17 @@ public class SerialPortView extends ViewFXML<SerialComm> {
             }
         });
 
-
         //更新要发送的数据
-        send.textProperty().addListener((_, _, newValue) -> {
-            if (!newValue.isEmpty()) {
-                bytes = hexSend.isSelected() ? CodeFormat.hex(newValue) : CodeFormat.utf8(newValue);
-            } else {
-                bytes = null;
-            }
-        });
+        send.textProperty().addListener((observable, oldValue, newValue) -> updateSendBytes());
 
         //16进制发送
-        hexSend.selectedProperty().addListener((_, _, newValue) -> {
-            String text = send.getText();
-            if (!text.isEmpty()) {
-                bytes = newValue ? CodeFormat.hex(text) : CodeFormat.utf8(text);
-            } else {
-                bytes = null;
-            }
-        });
+        hexSend.selectedProperty().addListener((observable, oldValue, newValue) -> updateSendBytes());
 
         //是否显示接收到的内容
-        receiveShow.selectedProperty().addListener((_, _, newValue) -> viewModel.setReceiveShow(newValue));
-
+        receiveShow.selectedProperty().addListener((observable, oldValue, newValue) -> viewModel.setReceiveShow(newValue));
 
         //实时刷新接收到的内容
-        viewModel.getRECEIVE_LONG_PROPERTY().addListener((_, _, _) -> {
+        viewModel.getRECEIVE_LONG_PROPERTY().addListener((observable, oldValue, newValue) -> {
             if (receiveShow.isSelected()) {
                 receive.setText(hexReceive.isSelected() ? CodeFormat.hex(viewModel.getData()) : CodeFormat.utf8(viewModel.getData()));
                 receive.setScrollTop(Double.MAX_VALUE);
@@ -335,7 +418,7 @@ public class SerialPortView extends ViewFXML<SerialComm> {
         });
 
         //将接收到的内容以16进制的形式进行发送
-        hexReceive.selectedProperty().addListener((_, _, newValue) -> {
+        hexReceive.selectedProperty().addListener((observable, oldValue, newValue) -> {
             byte[] data = viewModel.getData();
             receive.setText(newValue ? CodeFormat.hex(data) : CodeFormat.utf8(data));
             //滚动条自动滚动
@@ -343,12 +426,15 @@ public class SerialPortView extends ViewFXML<SerialComm> {
         });
 
         //如何串口被拔掉则将其关闭并且将串口的名称改为 ""
-        SerialPortMonitor.serialPorts.addListener((_, _, newValue) -> {
+        PortMonitor.serialPorts.addListener((observable, oldValue, newValue) -> {
             if (newValue != null && !newValue.contains(viewModel.getSerialPortName())) {
                 viewModel.close();
                 serialPortNamePicker.setValue("");
             }
         });
+        
+        // 初始化时更新UI文本
+        updateUITexts();
     }
 
     /**
@@ -380,7 +466,6 @@ public class SerialPortView extends ViewFXML<SerialComm> {
         flowControlPicker.setValue(flow);
     }
 
-
     /**
      * 创建串口调试窗口
      *
@@ -396,6 +481,19 @@ public class SerialPortView extends ViewFXML<SerialComm> {
         stage.getIcons().add(FX.image("ico.png"));
         FX.stageDrag(scene,stage);
         return loader.getController();
+    }
+
+    /**
+     * 更新发送字节数组
+     * Extract method to eliminate code duplication
+     */
+    private void updateSendBytes() {
+        String text = send.getText();
+        if (!text.isEmpty()) {
+            bytes = hexSend.isSelected() ? CodeFormat.hex(text) : CodeFormat.utf8(text);
+        } else {
+            bytes = null;
+        }
     }
 
     public Stage getStage() {

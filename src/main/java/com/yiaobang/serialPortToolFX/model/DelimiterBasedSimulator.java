@@ -1,11 +1,17 @@
-package com.yiaobang.serialPortToolFX.data;
+package com.yiaobang.serialporttoolfx.model;
 
 import java.util.Map;
 
-public class MockResponsesDelimiter extends MockResponses {
+/**
+ * 基于分隔符的模拟器
+ *
+ * @author Y
+ * @date 2024/05/15
+ */
+public class DelimiterBasedSimulator extends DeviceSimulator {
     private final byte[] delimiter;
 
-    protected MockResponsesDelimiter(Map<String, byte[]> replays, byte[] delimiter) {
+    protected DelimiterBasedSimulator(Map<String, byte[]> replays, byte[] delimiter) {
         super(replays);
         this.delimiter = delimiter;
     }

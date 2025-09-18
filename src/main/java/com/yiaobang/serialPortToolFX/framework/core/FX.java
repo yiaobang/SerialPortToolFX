@@ -1,5 +1,6 @@
-package com.yiaobang.serialPortToolFX.javafxTool.core;
+package com.yiaobang.serialporttoolfx.framework.core;
 
+import com.yiaobang.serialporttoolfx.utils.I18nUtils;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -12,7 +13,14 @@ import lombok.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ResourceBundle;
 
+/**
+ * JavaFX 工具类
+ *
+ * @author Y
+ * @date 2024/05/14
+ */
 public final class FX {
     private FX() {
     }
@@ -77,11 +85,31 @@ public final class FX {
             case String fxml -> scene(fxml);
             case FXMLLoader loader -> scene(loader);
             case Parent parent -> new Scene(parent);
-            default -> throw new RuntimeException("不支持转换的对象:" + obj.getClass().getName());
+            default -> throw new UnsupportedOperationException("Unsupported object type for scene conversion: " + obj.getClass().getName() + ". Supported types: String (FXML name), FXMLLoader, Parent");
         };
     }
     public static FXMLLoader fxmlLoader(String fxmlName) {
-        return new FXMLLoader(fxml(fxmlName));
+        FXMLLoader loader = new FXMLLoader(fxml(fxmlName));
+        // Set resource bundle for i18n
+        try {
+            String bundleName = "com.yiaobang.serialportfx.i18n.messages";
+            String suffix = switch (I18nUtils.getCurrentLocale().getLanguage()) {
+                case "zh" -> "_ZH";
+                case "ja" -> "_JA";
+                default -> "_EN";
+            };
+            ResourceBundle resources = ResourceBundle.getBundle(bundleName + suffix);
+            loader.setResources(resources);
+        } catch (Exception e) {
+            // Fallback to English if loading fails
+            try {
+                ResourceBundle resources = ResourceBundle.getBundle("com.yiaobang.serialportfx.i18n.messages_EN");
+                loader.setResources(resources);
+            } catch (Exception ignored) {
+                // Continue without resources if all fail
+            }
+        }
+        return loader;
     }
     public static Parent parent(String fxmlName) {
         try {

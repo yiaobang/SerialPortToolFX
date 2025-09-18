@@ -16,7 +16,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Circle?>
 
-<AnchorPane fx:id="root" prefHeight="579.0" prefWidth="741.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.yiaobang.serialPortToolFX.view.SerialPortView">
+<AnchorPane fx:id="root" prefHeight="579.0" prefWidth="741.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.yiaobang.serialporttoolfx.view.SerialPortView">
    <stylesheets>
       <URL value="@../fonts/fonts.css" />
       <URL value="@../css/serialport.css" />
@@ -28,64 +28,63 @@
       <StackPane layoutX="5.0" layoutY="5.0" prefHeight="28.0" prefWidth="28.0" styleClass="ico" AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="3.0">
          <Region prefHeight="200.0" prefWidth="200.0" />
       </StackPane>
+      <Label layoutX="540.0" layoutY="5.0" onMouseReleased="#switchLanguage" prefHeight="24.0" prefWidth="24.0" text="🌐" textAlignment="CENTER" AnchorPane.rightAnchor="177.0" style="-fx-font-size: 16px; -fx-cursor: hand;" />
       <ImageView fitHeight="30.0" fitWidth="30.0" layoutX="567.0" layoutY="2.0" onMouseReleased="#switchTheme" pickOnBounds="true" preserveRatio="true" AnchorPane.rightAnchor="144.0">
          <Image url="@../images/theme.png" />
       </ImageView>
    </AnchorPane>
    <HBox layoutX="39.0" layoutY="572.0" prefHeight="34.0" prefWidth="662.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
       <HBox prefHeight="34.0" prefWidth="400.0">
-         <Label prefHeight="38.0" prefWidth="73.0" styleClass="title" text="发送:" />
+         <Label fx:id="sendLabel" prefHeight="38.0" prefWidth="73.0" styleClass="title" text="发送:" />
          <Label fx:id="sendNumber" onMousePressed="#cleanSendNumber" prefHeight="36.0" prefWidth="305.0" text="0" />
       </HBox>
       <HBox prefHeight="34.0" prefWidth="400.0">
-         <Label prefHeight="34.0" prefWidth="55.0" styleClass="title" text="接收:" />
+         <Label fx:id="receiveLabel" prefHeight="34.0" prefWidth="55.0" styleClass="title" text="接收:" />
          <Label fx:id="receiveNumber" onMousePressed="#cleanReceiveNumber" prefHeight="34.0" prefWidth="345.0" text="0" />
       </HBox>
    </HBox>
    <VBox layoutX="515.0" layoutY="42.0" spacing="10.0">
       <HBox>
-         <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="29.0" prefWidth="50.0" text="串口号" />
+         <Label fx:id="serialPortLabel" alignment="CENTER" contentDisplay="CENTER" prefHeight="29.0" prefWidth="50.0" text="%label.serial_port_number" />
          <ComboBox fx:id="serialPortNamePicker" prefHeight="35.0" prefWidth="167.0" />
       </HBox>
       <HBox>
-         <Label prefHeight="29.0" prefWidth="50.0" text="波特率" />
+         <Label fx:id="baudRateLabel" prefHeight="29.0" prefWidth="50.0" text="%label.baud_rate" />
          <ComboBox fx:id="baudRatePicker" prefHeight="35.0" prefWidth="167.0" />
       </HBox>
       <HBox>
-         <Label prefHeight="29.0" prefWidth="50.0" text="数据位" />
+         <Label fx:id="dataBitsLabel" prefHeight="29.0" prefWidth="50.0" text="%label.data_bits" />
          <ComboBox fx:id="dataBitsPicker" prefHeight="35.0" prefWidth="167.0" />
       </HBox>
       <HBox>
-         <Label prefHeight="29.0" prefWidth="50.0" text="停止位" />
+         <Label fx:id="stopBitsLabel" prefHeight="29.0" prefWidth="50.0" text="%label.stop_bits" />
          <ComboBox fx:id="stopBitsPicker" prefHeight="35.0" prefWidth="167.0" />
       </HBox>
       <HBox>
-         <Label prefHeight="29.0" prefWidth="50.0" text="校   验" />
+         <Label fx:id="parityLabel" prefHeight="29.0" prefWidth="50.0" text="%label.parity" />
          <ComboBox fx:id="parityPicker" prefHeight="35.0" prefWidth="167.0" />
       </HBox>
       <HBox>
-         <Label prefHeight="29.0" prefWidth="50.0" text="流   控" />
+         <Label fx:id="flowControlLabel" prefHeight="29.0" prefWidth="50.0" text="%label.flow_control" />
          <ComboBox fx:id="flowControlPicker" prefHeight="35.0" prefWidth="167.0" />
       </HBox>
    </VBox>
    <TextArea fx:id="receive" editable="false" layoutX="6.0" layoutY="40.0" prefHeight="352.0" prefWidth="500.0" wrapText="true" />
    <Button fx:id="serialPortSwitch" layoutX="524.0" layoutY="316.0" mnemonicParsing="false" onAction="#serialPortSwitch" prefHeight="35.0" prefWidth="87.0" text="打开串口" />
-   <Button layoutX="636.0" layoutY="316.0" mnemonicParsing="false" onAction="#cleanReceive" prefHeight="35.0" prefWidth="87.0" text="清除接收" />
-   <Button layoutX="524.0" layoutY="408.0" mnemonicParsing="false" onAction="#sendData" prefHeight="35.0" prefWidth="87.0" text="发送数据" />
-   <Button layoutX="636.0" layoutY="408.0" mnemonicParsing="false" onAction="#cleanSend" prefHeight="35.0" prefWidth="87.0" text="清除发送" />
+   <Button fx:id="clearReceiveBtn" layoutX="636.0" layoutY="316.0" mnemonicParsing="false" onAction="#cleanReceive" prefHeight="35.0" prefWidth="87.0" text="清除接收" />
+   <Button fx:id="sendDataBtn" layoutX="524.0" layoutY="408.0" mnemonicParsing="false" onAction="#sendData" prefHeight="35.0" prefWidth="87.0" text="发送数据" />
+   <Button fx:id="clearSendBtn" layoutX="636.0" layoutY="408.0" mnemonicParsing="false" onAction="#cleanSend" prefHeight="35.0" prefWidth="87.0" text="清除发送" />
    <CheckBox fx:id="receiveShow" layoutX="524.0" layoutY="363.0" mnemonicParsing="false" prefHeight="29.0" prefWidth="87.0" selected="true" text="接收显示" />
    <Circle fx:id="serialPortLight" fill="#ff1f1f" layoutX="531.0" layoutY="334.0" radius="6.0" stroke="BLACK" strokeType="INSIDE" />
-   <Button layoutX="524.0" layoutY="454.0" mnemonicParsing="false" onAction="#createSerialPortStage" prefHeight="35.0" prefWidth="87.0" text="新建窗口" />
-   <Button layoutX="636.0" layoutY="454.0" mnemonicParsing="false" onAction="#analogReply" prefHeight="35.0" prefWidth="87.0" text="模拟回复" />
+   <Button fx:id="newWindowBtn" layoutX="524.0" layoutY="454.0" mnemonicParsing="false" onAction="#createSerialPortStage" prefHeight="35.0" prefWidth="87.0" text="新建窗口" />
+   <Button fx:id="analogReplyBtn" layoutX="636.0" layoutY="454.0" mnemonicParsing="false" onAction="#analogReply" prefHeight="35.0" prefWidth="87.0" text="模拟回复" />
    <CheckBox fx:id="receiveSave" layoutX="537.0" layoutY="549.0" mnemonicParsing="false" prefHeight="29.0" prefWidth="138.0" text="记录接收数据" AnchorPane.bottomAnchor="34.0" />
    <CheckBox fx:id="sendSave" graphicTextGap="6.0" layoutX="183.0" layoutY="549.0" mnemonicParsing="false" prefHeight="29.0" prefWidth="123.0" text="记录发送数据" wrapText="true" AnchorPane.bottomAnchor="34.0" />
-   <HBox alignment="CENTER" layoutX="93.0" layoutY="493.0" prefHeight="29.0" prefWidth="232.0">
-      <CheckBox fx:id="timedDispatch" mnemonicParsing="false" prefHeight="29.0" prefWidth="87.0" text="循环发送" />
-      <HBox alignment="CENTER">
-         <Label prefHeight="29.0" text="频率" textAlignment="CENTER" textOverrun="CENTER_ELLIPSIS" />
-         <TextField fx:id="time" prefHeight="27.0" prefWidth="70.0" text="1000" />
-         <Label prefHeight="29.0" text="ms/次" />
-      </HBox>
+   <HBox alignment="CENTER_LEFT" layoutX="93.0" layoutY="493.0" prefHeight="29.0" prefWidth="350.0" spacing="8.0">
+      <CheckBox fx:id="timedDispatch" mnemonicParsing="false" text="循环发送" />
+      <Label fx:id="frequencyLabel" text="频率" />
+      <TextField fx:id="time" prefHeight="27.0" prefWidth="70.0" text="1000" />
+      <Label fx:id="msLabel" text="ms/次" />
    </HBox>
    <CheckBox fx:id="hexSend" layoutX="6.0" layoutY="497.0" mnemonicParsing="false" prefHeight="21.0" prefWidth="87.0" text="HEX发送" />
    <CheckBox fx:id="hexReceive" layoutX="636.0" layoutY="368.0" mnemonicParsing="false" prefHeight="21.0" prefWidth="87.0" text="HEX显示" />

@@ -1,11 +1,17 @@
-package com.yiaobang.serialPortToolFX.data;
+package com.yiaobang.serialporttoolfx.model;
 
 import java.util.Map;
 
-public class MockResponsesPackSize extends MockResponses {
+/**
+ * 固定长度模拟器
+ *
+ * @author Y
+ * @date 2024/05/15
+ */
+public class FixedLengthSimulator extends DeviceSimulator {
     private final int packSize;
 
-    protected MockResponsesPackSize(Map<String, byte[]> replays, int packSize) {
+    protected FixedLengthSimulator(Map<String, byte[]> replays, int packSize) {
         super(replays);
         this.packSize = packSize;
     }

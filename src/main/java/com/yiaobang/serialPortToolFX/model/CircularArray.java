@@ -1,4 +1,4 @@
-package com.yiaobang.serialPortToolFX.data;
+package com.yiaobang.serialporttoolfx.model;
 
 /**
  * 循环数组

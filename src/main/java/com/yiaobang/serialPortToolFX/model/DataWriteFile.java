@@ -1,9 +1,8 @@
-package com.yiaobang.serialPortToolFX.data;
+package com.yiaobang.serialporttoolfx.model;
 
-
-import com.yiaobang.serialPortToolFX.AppLauncher;
-import com.yiaobang.serialPortToolFX.utils.CodeFormat;
-import com.yiaobang.serialPortToolFX.utils.TimeUtils;
+import com.yiaobang.serialporttoolfx.AppLauncher;
+import com.yiaobang.serialporttoolfx.utils.CodeFormat;
+import com.yiaobang.serialporttoolfx.utils.TimeUtils;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -12,6 +11,8 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
 /**
+ * 数据文件写入
+ *
  * @author Y
  * @version 1.0
  * @date 2024/3/23 14:56
@@ -37,6 +38,7 @@ public class DataWriteFile {
         readFile = read.toPath();
         writeFile = write.toPath();
     }
+    
     public void serialCommReceive(byte[] bytes) {
         Thread.startVirtualThread(() -> {
             try {
@@ -46,6 +48,7 @@ public class DataWriteFile {
             }
         });
     }
+    
     public void serialCommSend(byte[] bytes) {
         Thread.startVirtualThread(() -> {
             try {
@@ -55,5 +58,4 @@ public class DataWriteFile {
             }
         });
     }
-
 }

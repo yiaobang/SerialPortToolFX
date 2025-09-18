@@ -7,12 +7,11 @@ plugins {
 }
 
 group = 'com.yiaobang'
-version = '1.1.0'
+version = '1.2.0'
 
 java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(25)
-    }
+    sourceCompatibility = JavaVersion.VERSION_22
+    targetCompatibility = JavaVersion.VERSION_22
 }
 
 repositories {
@@ -23,7 +22,7 @@ repositories {
 }
 
 javafx {
-    version = '24.0.1'
+    version = '24.0.2'
     modules = ['javafx.controls', 'javafx.fxml']
 }
 
@@ -55,10 +54,13 @@ tasks.withType(JavaCompile).configureEach {
 
 application {
     applicationName = 'SerialPortToolFX'
-    mainClass = 'com.yiaobang.serialPortToolFX.AppLauncher'
+    mainClass = 'com.yiaobang.serialporttoolfx.AppLauncher'
     mainModule = 'SerialPortToolFX'
     applicationDefaultJvmArgs = ['-Dfile.encoding=UTF-8'
                                  , '-XX:+UseZGC'
+//            ,'-XX:+UseCompactObjectHeaders'
+            ,'--add-opens=java.base/sun.nio.ch=ALL-UNNAMED'
+            ,'--add-opens=java.base/java.io=ALL-UNNAMED'
     ]
 }
 

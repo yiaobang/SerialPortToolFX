@@ -1,5 +1,11 @@
-package com.yiaobang.serialPortToolFX.data;
+package com.yiaobang.serialporttoolfx.model;
 
+/**
+ * 字节缓冲区
+ *
+ * @author Y
+ * @date 2024/05/14
+ */
 public final class ByteBuffer {
     private final CircularArray CircularQueue;
 
@@ -8,7 +14,9 @@ public final class ByteBuffer {
     }
 
     public void add(byte[] bytes) {
-        CircularQueue.add(bytes);
+        if (bytes != null) {
+            CircularQueue.add(bytes);
+        }
     }
 
     public byte[] getBuffer() {

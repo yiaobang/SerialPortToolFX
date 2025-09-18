@@ -1,11 +1,18 @@
-package com.yiaobang.serialPortToolFX.javafxTool.theme;
+package com.yiaobang.serialporttoolfx.framework.theme;
 
+/**
+ * 主题枚举
+ *
+ * @author Y
+ * @date 2024/05/14
+ */
 public enum Theme {
     CUPERTINO_LIGHT("/atlantafx/base/theme/cupertino-light.css"),
     CUPERTINO_DARK("/atlantafx/base/theme/cupertino-dark.css");
 
     private final String css;
-    private static final int length = values().length;
+    private static final Theme[] VALUES = values();
+    private static final int LENGTH = VALUES.length;
 
     Theme(String css) {
         this.css = css;
@@ -16,6 +23,6 @@ public enum Theme {
     }
 
     public static String rotationTheme(int index) {
-        return values()[index % length].css;
+        return VALUES[index % LENGTH].css;
     }
 }

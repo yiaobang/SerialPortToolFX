@@ -1,28 +1,30 @@
-package com.yiaobang.serialPortToolFX.serialComm;
+package com.yiaobang.serialporttoolfx.serial;
 
 import com.fazecast.jSerialComm.SerialPort;
-import com.yiaobang.serialPortToolFX.javafxTool.core.FX;
+import com.yiaobang.serialporttoolfx.framework.core.FX;
 import javafx.beans.property.SimpleStringProperty;
 import java.util.StringJoiner;
 
 /**
- * 串口监视器
+ * 端口监视器
  *
  * @author Y
  * @date 2024/05/14
  */
-public class SerialPortMonitor {
+public class PortMonitor {
     public static volatile SerialPort[] commPorts = SerialPort.getCommPorts();
     public static final SimpleStringProperty serialPorts = new SimpleStringProperty(serialPortsToString());
     public static final Thread serialPortMonitorThread;
+    
     static {
         serialPortMonitorThread = new Thread(() -> {
             while (true) {
                 scanSerialPort();
                 try {
                     Thread.sleep(2000);
-                } catch (InterruptedException ignored) {
-
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
                 }
             }
         }, "串口监控线程");
@@ -35,10 +37,8 @@ public class SerialPortMonitor {
         SerialPort[] newPorts = SerialPort.getCommPorts();
         if (!checkSerialPort(newPorts)) {
             commPorts = newPorts;
-            FX.run(() -> {
-                String s = serialPortsToString();
-                serialPorts.set(s == null ? "" : s);
-            });
+            String portString = serialPortsToString();
+            FX.run(() -> serialPorts.set(portString == null ? "" : portString));
         }
     }
 
@@ -60,12 +60,18 @@ public class SerialPortMonitor {
         if (commPorts.length != newPorts.length) {
             return false;
         }
-        for (int i = 0; i < newPorts.length; i++) {
-            if (!commPorts[i].getSystemPortName().equals(newPorts[i].getSystemPortName())) {
-                return false;
-            }
+        // Use Set-based comparison to handle port reordering
+        java.util.Set<String> currentPorts = new java.util.HashSet<>();
+        java.util.Set<String> newPortNames = new java.util.HashSet<>();
+        
+        for (SerialPort port : commPorts) {
+            currentPorts.add(port.getSystemPortName());
         }
-        return true;
+        for (SerialPort port : newPorts) {
+            newPortNames.add(port.getSystemPortName());
+        }
+        
+        return currentPorts.equals(newPortNames);
     }
 
     public static void init() {
