@@ -10,8 +10,8 @@ group = 'com.yiaobang'
 version = '1.2.0'
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_22
-    targetCompatibility = JavaVersion.VERSION_22
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
 }
 
 repositories {
@@ -22,7 +22,7 @@ repositories {
 }
 
 javafx {
-    version = '24.0.2'
+    version = '25'
     modules = ['javafx.controls', 'javafx.fxml']
 }
 
@@ -58,7 +58,7 @@ application {
     mainModule = 'SerialPortToolFX'
     applicationDefaultJvmArgs = ['-Dfile.encoding=UTF-8'
                                  , '-XX:+UseZGC'
-//            ,'-XX:+UseCompactObjectHeaders'
+            ,'-XX:+UseCompactObjectHeaders'
             ,'--add-opens=java.base/sun.nio.ch=ALL-UNNAMED'
             ,'--add-opens=java.base/java.io=ALL-UNNAMED'
     ]

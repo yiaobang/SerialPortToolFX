@@ -22,16 +22,16 @@ jobs:
       - name: Checkout project
         uses: actions/checkout@v4
 
-      - name: Set up JDK 22 (Zulu, with jmods)
+      - name: Set up JDK 25 (Zulu, with jmods)
         uses: actions/setup-java@v4
         with:
-          java-version: '22'
+          java-version: '25'
           distribution: 'zulu'
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4.0.0
         with:
-          gradle-version: '9.0.0'
+          gradle-version: '9.1.0-rc-4'
 
       - name: Grant execute permission for gradlew (Linux/macOS)
         if: runner.os != 'Windows'
