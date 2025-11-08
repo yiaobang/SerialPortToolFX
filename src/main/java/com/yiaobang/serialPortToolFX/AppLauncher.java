@@ -30,14 +30,14 @@ public class AppLauncher extends Application {
     public static JavaFXBuilderFactory JAVAFX_BUILDER_FACTORY;
 
     public static void main(String[] args) {
-        System.setProperty("prism.lcdtext", "false");
-        System.setProperty("prism.allowhidpi", "false");
         launch(args);
     }
 
     @Override
     public void init() throws Exception {
         super.init();
+        System.setProperty("prism.lcdtext", "false");
+        System.setProperty("prism.allowhidpi", "false");
         //加载主题
         Application.setUserAgentStylesheet(Theme.CUPERTINO_LIGHT.getCss());
         JAVAFX_BUILDER_FACTORY = new JavaFXBuilderFactory();
