@@ -3,11 +3,11 @@ plugins {
     id('application')
     id('org.javamodularity.moduleplugin') version '2.0.0'
     id('org.openjfx.javafxplugin') version '0.1.0'
-    id('org.beryx.jlink') version '3.1.3'
+    id('org.beryx.jlink') version '3.2.1'
 }
 
 group = 'com.yiaobang'
-version = '1.2.0'
+version = '2.0.0'
 
 java {
     sourceCompatibility = JavaVersion.VERSION_25
@@ -71,9 +71,16 @@ jlink {
     options.set(List.of('--strip-debug', '--compress', 'zip-9', '--no-header-files', '--no-man-pages'))
     launcher {
         name = "SerialPortToolFX"
-        imageName.set("SerialPortToolFX")
+        //imageName.set("SerialPortToolFX")
+        jvmArgs = [
+                '--Dfile.encoding=UTF-8',
+                '--add-opens=java.base/sun.nio.ch=ALL-UNNAMED',
+                '--add-opens=java.base/java.io=ALL-UNNAMED',
+                // 必须授权，否则 jSerialComm 无法加载本地库
+                '--enable-native-access=javafx.graphics,com.fazecast.jSerialComm'
+        ]
     }
-    imageZip.set(project.layout.buildDirectory.file("image-zip/${application.applicationName}.zip"))
+    imageZip.set(project.layout.buildDirectory.file("image-zip/${application.applicationName}-${version}-Portable.zip"))
 
     jpackage {
         outputDir = 'jpackage'
@@ -82,7 +89,9 @@ jlink {
         appVersion = version                               // 避免 jpackage 再自动拼一次
         vendor = "yiaobang"
         description = "A practical serial port utility built with JavaFX."
-
+        jvmArgs = [
+                '--enable-native-access=javafx.graphics,com.fazecast.jSerialComm'
+        ]
         // 是否跳过创建安装包（可根据需求设为 true/false）
         skipInstaller = false
 
@@ -90,7 +99,7 @@ jlink {
         def os = org.gradle.internal.os.OperatingSystem.current()
         if (os.isWindows()) {
             icon = 'src/main/resources/application.ico'
-            installerOptions.addAll([
+            installerOptions = [
                     '--win-dir-chooser',           // 允许用户选择安装目录
                     '--win-menu',                  // 在开始菜单创建快捷方式
                     '--win-shortcut',              // 在桌面创建快捷方式
@@ -98,18 +107,18 @@ jlink {
                     '--win-upgrade-uuid', 'c1f5e3a8-6f4a-4c2a-9c95-8d3c7345b91e', // 升级唯一标识
                     '--win-shortcut-prompt',       // 提示是否创建快捷方式
                     '--win-help-url', 'https://github.com/yiaobang/SerialPortToolFX' // 帮助链接
-            ])
+            ]
         }
         if (os.isMacOsX()) {
             icon = 'src/main/resources/ico.icns'
-            installerOptions.addAll([
+            installerOptions = [
                     '--mac-package-identifier', 'com.yiaobang.serialPortToolFX' // 应用包标识符
-            ])
+            ]
         }
         if (os.isLinux()) {
             icon = 'src/main/resources/ico.png'
             installerType = 'deb'
-            installerOptions.addAll([
+            installerOptions=[
                     '--linux-deb-maintainer', 'yiaobang@gmail.com', // 维护者信息
                     '--linux-menu-group', application.applicationName, // 菜单组名
                     '--linux-shortcut', // 创建桌面快捷方式
@@ -117,7 +126,7 @@ jlink {
                     '--linux-description', 'A practical serial port utility built with JavaFX.', // 应用描述
                     '--linux-url', 'https://github.com/yiaobang/SerialPortToolFX', // 应用主页
                     '--linux-bundle-name', 'serialPortToolFX' // 安装包名
-            ])
+            ]
         }
 
     }

@@ -2,15 +2,15 @@ name: Java CI with Gradle
 
 on:
   push:
-#    branches: [ "master" ]
-    tags: # 额外添加对 tags 推送事件的监听
-      - 'v*' # 匹配所有以 'v' 开头的标签，例如 v1.0.0, v2.1等
+    branches: [ "master" ]
+    tags:
+      - 'v*'
   pull_request:
     branches: [ "master" ]
 
 jobs:
   build-and-package:
-    name: Build & Package on ${{ matrix.os }}
+    name: Build on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -22,79 +22,102 @@ jobs:
       - name: Checkout project
         uses: actions/checkout@v4
 
-      - name: Set up JDK 25 (Zulu, with jmods)
+      - name: Set up JDK 25
         uses: actions/setup-java@v4
         with:
           java-version: '25'
           distribution: 'zulu'
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4.0.0
+        uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: '9.1.0-rc-4'
+          gradle-version: '9.3.1'
 
-      - name: Grant execute permission for gradlew (Linux/macOS)
+      - name: Grant execute permission
         if: runner.os != 'Windows'
         run: chmod +x ./gradlew
 
-      - name: Install ZIP Utility
-        if: runner.os == 'Windows'
-        run: |
-          choco install zip -y
-
-      - name: Build project
-        run: ./gradlew build
-
-      - name: Package app with jpackage
+      - name: Run jpackage
+        # 该命令会生成安装包和镜像文件夹
         run: ./gradlew jpackage
 
-      - name: Zip packaged app
+      # --- 收集并处理发布文件 (Windows) ---
+      - name: Prepare Artifacts (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
         run: |
+          mkdir dist-files
+          # 1. 复制安装包 (exe 或 msi)
+          Copy-Item "build/jpackage/*.exe" "dist-files/" -ErrorAction SilentlyContinue
+          Copy-Item "build/jpackage/*.msi" "dist-files/" -ErrorAction SilentlyContinue
+          # 2. 将免安装文件夹打成 Zip
+          Compress-Archive -Path "build/jpackage/SerialPortToolFX/*" -DestinationPath "dist-files/SerialPortToolFX-Windows-Portable.zip"
+
+      # --- 收集并处理发布文件 (macOS) ---
+      - name: Prepare Artifacts (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          mkdir dist-files
+          # 1. 复制安装包 (dmg 或 pkg)
+          cp build/jpackage/*.dmg dist-files/ 2>/dev/null || true
+          # 2. 将 .app 文件夹打成 Zip (macOS 免安装版)
           cd build/jpackage
-          # 在这里修改压缩包的命名方式，加入版本号
-          # github.ref_name 会自动获取到标签名称，例如 'v1.0.0'
-          zip -r ../../packaged-app-${{ github.ref_name }}-${{ matrix.os }}.zip .
+          zip -r ../../dist-files/SerialPortToolFX-macOS-Portable.zip SerialPortToolFX.app
           cd ../..
 
-      - name: Upload packaged artifact
+      # --- 收集并处理发布文件 (Linux) ---
+      - name: Prepare Artifacts (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          mkdir dist-files
+          # 1. 复制安装包 (deb)
+          cp build/jpackage/*.deb dist-files/ 2>/dev/null || true
+          # 2. 将二进制文件夹打成 Zip
+          cd build/jpackage/SerialPortToolFX
+          zip -r ../../../dist-files/SerialPortToolFX-Linux-Portable.zip .
+          cd ../../../
+
+      # --- 上传到当前运行缓存 ---
+      - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          # 修改上传的 artifact 名称，保持一致性
-          name: packaged-app-${{ github.ref_name }}-${{ matrix.os }}
-          path: packaged-app-${{ github.ref_name }}-${{ matrix.os }}.zip
+          name: artifacts-${{ matrix.os }}
+          path: dist-files/*
 
   release:
-    name: Release artifacts
+    name: Create GitHub Release
     needs: build-and-package
     runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
     permissions:
       contents: write
-    # 只有当工作流是由 Git Tag 推送触发时才运行此 job
-    if: startsWith(github.ref, 'refs/tags/')
 
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Download packaged artifacts
+      - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
-#          # 下载时需要与上传的 artifact 名称保持一致
-#          # 使用 `*` 来匹配所有带有版本号和操作系统的 artifact
-#          name: packaged-app-${{ github.ref_name }}-*
-          path: dist
+          pattern: artifacts-*
+          path: final-dist
+          merge-multiple: true
 
-      - name: List dist contents
-        run: ls -l dist
+      - name: List Release Files
+        run: ls -R final-dist
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
+      - name: Publish Release
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
           body: |
-            自动化打包并发布，包含 Linux、Windows、macOS 平台的压缩包。
-            版本号：${{ github.ref_name }}
-          # 确保 files 能够匹配带有版本号的压缩包
-          files: dist/**/*.zip
+            ## SerialPortToolFX v${{ github.ref_name }}
+            
+            ### 📦 下载指南：
+            *   **Windows**: 下载 `.exe` (安装版) 或 `-Windows-Portable.zip` (免安装版)。
+            *   **macOS**: 下载 `.dmg` (安装版) 或 `-macOS-Portable.zip` (解压即用)。
+            *   **Linux**: 下载 `.deb` (Debian/Ubuntu) 或 `-Linux-Portable.zip`。
+            
+            ---
+            *构建环境: Java 25 + Gradle 9.3.1*
+          files: final-dist/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
