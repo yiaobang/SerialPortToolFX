@@ -38,46 +38,41 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Run jpackage
-        # 该命令会生成安装包和镜像文件夹
-        run: ./gradlew jpackage
+        # 关键修复：通过 GRADLE_OPTS 解决 Java 25 的权限警告，--no-daemon 防止卡死
+        env:
+          GRADLE_OPTS: "-Dfile.encoding=UTF-8 --enable-native-access=ALL-UNNAMED"
+        run: ./gradlew jpackage --no-daemon
 
-      # --- 收集并处理发布文件 (Windows) ---
+      # --- 收集 Windows 发布文件 ---
       - name: Prepare Artifacts (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
           mkdir dist-files
-          # 1. 复制安装包 (exe 或 msi)
           Copy-Item "build/jpackage/*.exe" "dist-files/" -ErrorAction SilentlyContinue
           Copy-Item "build/jpackage/*.msi" "dist-files/" -ErrorAction SilentlyContinue
-          # 2. 将免安装文件夹打成 Zip
           Compress-Archive -Path "build/jpackage/SerialPortToolFX/*" -DestinationPath "dist-files/SerialPortToolFX-Windows-Portable.zip"
 
-      # --- 收集并处理发布文件 (macOS) ---
+      # --- 收集 macOS 发布文件 ---
       - name: Prepare Artifacts (macOS)
         if: runner.os == 'macOS'
         run: |
           mkdir dist-files
-          # 1. 复制安装包 (dmg 或 pkg)
           cp build/jpackage/*.dmg dist-files/ 2>/dev/null || true
-          # 2. 将 .app 文件夹打成 Zip (macOS 免安装版)
           cd build/jpackage
           zip -r ../../dist-files/SerialPortToolFX-macOS-Portable.zip SerialPortToolFX.app
           cd ../..
 
-      # --- 收集并处理发布文件 (Linux) ---
+      # --- 收集 Linux 发布文件 ---
       - name: Prepare Artifacts (Linux)
         if: runner.os == 'Linux'
         run: |
           mkdir dist-files
-          # 1. 复制安装包 (deb)
           cp build/jpackage/*.deb dist-files/ 2>/dev/null || true
-          # 2. 将二进制文件夹打成 Zip
           cd build/jpackage/SerialPortToolFX
           zip -r ../../../dist-files/SerialPortToolFX-Linux-Portable.zip .
           cd ../../../
 
-      # --- 上传到当前运行缓存 ---
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -100,9 +95,6 @@ jobs:
           path: final-dist
           merge-multiple: true
 
-      - name: List Release Files
-        run: ls -R final-dist
-
       - name: Publish Release
         uses: softprops/action-gh-release@v2
         with:
@@ -110,14 +102,9 @@ jobs:
           name: Release ${{ github.ref_name }}
           body: |
             ## SerialPortToolFX v${{ github.ref_name }}
-            
-            ### 📦 下载指南：
-            *   **Windows**: 下载 `.exe` (安装版) 或 `-Windows-Portable.zip` (免安装版)。
-            *   **macOS**: 下载 `.dmg` (安装版) 或 `-macOS-Portable.zip` (解压即用)。
-            *   **Linux**: 下载 `.deb` (Debian/Ubuntu) 或 `-Linux-Portable.zip`。
-            
-            ---
-            *构建环境: Java 25 + Gradle 9.3.1*
+            - 全新 AtlantaFX 卡片式精致布局
+            - 适配中、英、日三语显示
+            - 修复 Java 25 运行权限问题
           files: final-dist/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
