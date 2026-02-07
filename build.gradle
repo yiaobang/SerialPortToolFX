@@ -123,7 +123,6 @@ jlink {
                     '--linux-menu-group', application.applicationName, // 菜单组名
                     '--linux-shortcut', // 创建桌面快捷方式
                     '--linux-app-category', 'Utility', // 应用类别
-                    '--linux-bundle-name', 'serialPortToolFX' // 安装包名
             ]
         }
 
