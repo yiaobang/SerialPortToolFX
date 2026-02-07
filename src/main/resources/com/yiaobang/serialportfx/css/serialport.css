@@ -1,77 +1,95 @@
+/* --- 1. 全局基础：适配多语言与 AtlantaFX --- */
 * {
-    -fx-font-family: "HONOR Sans CN Medium";
-}
-
-.label {
-    -fx-alignment: center;
+    -fx-font-family: "HONOR Sans CN Medium", "Segoe UI", sans-serif;
+    -fx-font-size: 13px; /* 13px 最精致，适配英日文不拥挤 */
 }
 
 #root {
-    /*-fx-background-color: White;*/
+    -fx-background-color: -color-bg-default;
     -fx-background-radius: 12 12 0 0;
 }
 
 .top {
-    /*-fx-background-color: #e5e4e4;*/
+    -fx-background-color: -color-bg-subtle;
     -fx-background-radius: 12 12 0 0;
+    -fx-border-color: transparent transparent -color-border-muted transparent;
+    -fx-border-width: 0 0 1 0;
 }
 
-.ico Region {
-    -fx-shape: "M512 0a512 512 0 1 0 512 512A512 512 0 0 0 512 0z m-34.5088 992.0512v-199.2704h69.0176v199.2704c-11.4176 0.8192-22.8864 1.2288-34.5088 1.2288s-23.0912-0.4608-34.5088-1.2288zM273.8688 431.2064h19.1488v226.9696h-19.1488z m-30.72-30.72h-10.8544v-19.1488h559.4112v19.1488H243.1488zM629.76 350.6176H394.24V281.6h235.52z m101.376 80.5888h19.1488v226.9696h-19.1488z m-362.496 0h286.72v197.1712l-65.792 133.6832H434.2784L368.64 628.3776z m208.7424 557.6192v-196.0448h31.5904L686.08 635.5456V431.2064h14.0288v257.6896h80.5888V431.2064h41.5744V350.6176H757.76v-70.656h-34.8672v70.656H660.48V250.88H363.52v99.7376H300.8512v-70.656H266.24v70.656H201.5744v80.5888h41.5744v257.6896h80.5888V431.2064H337.92v204.3392l77.4144 157.2352h31.5904v196.0448a481.28 481.28 0 1 1 130.4576 0z";
-    -fx-background-color: red;
+/* --- 2. 下拉框 (ComboBox) --- */
+.combo-box {
+    -fx-background-radius: 6;
 }
-
-.min {
-    -fx-padding: 0;
-    -fx-background-radius: 0;
-    -fx-background-color: transparent;
-}
-
-.min:hover {
-    -fx-background-color: #7a7a7a;
-}
-
-.exit {
-    -fx-padding: 0;
-    -fx-background-radius: 0 12 0 0;
-    -fx-background-color: transparent;
-}
-
-.exit:hover {
-    -fx-background-color: #b71515;
-}
-/* 设置下拉列表中选项的文本居中对齐 */
 .combo-box .list-cell {
-    -fx-alignment: center;
-
+    -fx-alignment: center; /* 下拉列表文字居中 */
 }
-/* 设置选择按钮中的文本居中对齐 */
 .combo-box .list-cell:filled:selected .text {
-    -fx-alignment: center;
-}
-.title {
-    -fx-background-color: rgba(255, 0, 0, 0.4);
-    -fx-pref-width: 55;
-    -fx-pref-height: 34;
+    -fx-alignment: center; /* 选中后的展示文字居中 */
 }
 
-#sendNumber, #receiveNumber {
-    -fx-background-color: rgba(46, 148, 251, 0.4);
-    -fx-font-size: 22;
-    -fx-pref-width: 345;
-    -fx-pref-height: 34;
+/* --- 3. 文本区域 (TextArea) --- */
+/* 接收区：保持精致终端感 */
+#receive {
+   // -fx-control-inner-background: #0d1117; /* GitHub Dark 风格 */
+    -fx-background-color: black;
+    -fx-text-fill: #39d353; /* 经典绿字 */
+    -fx-font-family: "JetBrains Mono", "Consolas", monospace;
+    -fx-font-size: 14px;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+   // -fx-border-color: -color-border-muted;
 }
-#time{
+
+/* 发送输入区 */
+#send {
+    -fx-font-family: "JetBrains Mono", "Consolas", monospace;
+    -fx-font-size: 14px;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+}
+
+/* --- 4. 底部状态计数栏 (修复断层与缝隙) --- */
+/* 状态栏容器去掉所有间距 */
+.status-bar-row {
+    -fx-spacing: 0;
+    -fx-padding: 0;
+}
+
+/* 红色标签块 */
+.title {
+    -fx-background-color: rgba(255, 107, 107, 0.2);
+    -fx-text-fill: -color-danger-fg;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+}
+
+/* 蓝色数字块 */
+#sendNumber, #receiveNumber {
+    -fx-background-color: rgba(46, 148, 251, 0.2);
+    -fx-text-fill: -color-accent-fg;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-alignment: center; /* 确保数字居中 */
+    -fx-cursor: hand;
+}
+
+#sendNumber:hover, #receiveNumber:hover {
+    -fx-background-color: rgba(46, 148, 251, 0.35);
+}
+
+/* --- 5. 其他细节 --- */
+#time {
     -fx-alignment: center;
     -fx-padding: 0;
-    -fx-pref-height: 27;
-}
-#receive{
-    -fx-background-color: black;
-    -fx-text-fill: rgb(0, 255, 0);
-    -fx-font-size: 16;
-}
-#send{
-    -fx-font-size: 16;
+    -fx-background-radius: 4;
 }
 
+/* 指示灯：增加呼吸感发光 */
+#serialPortLight[fill="LIME"], #analogLight[fill="LIME"] {
+    -fx-effect: dropshadow(three-pass-box, rgba(57, 211, 83, 0.5), 10, 0.5, 0, 0);
+}
+
+.button {
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+}

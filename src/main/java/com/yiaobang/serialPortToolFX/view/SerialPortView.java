@@ -283,9 +283,9 @@ public class SerialPortView extends ViewFXML<SerialComm> {
     public void updateUITexts() {
         // 更新串口开关按钮
         serialPortSwitch.textProperty().unbind();
-        serialPortSwitch.textProperty().bind(viewModel.getSerialPortState().map(state -> 
+        serialPortSwitch.textProperty().bind(viewModel.getSerialPortState().map(state ->
             state ? I18nUtils.getString("button.close_serial_port") : I18nUtils.getString("button.open_serial_port")));
-        
+
         // 更新复选框
         receiveShow.setText(I18nUtils.getString("checkbox.receive_display"));
         receiveSave.setText(I18nUtils.getString("checkbox.record_receive_data"));
@@ -472,15 +472,22 @@ public class SerialPortView extends ViewFXML<SerialComm> {
      * @return {@link SerialPortView }
      */
     public static SerialPortView createSerialPortView() {
-        Stage stage = new Stage(StageStyle.TRANSPARENT);
-        FXMLLoader loader = FX.fxmlLoader("serialPortView.fxml");
-        loader.setBuilderFactory(JAVAFX_BUILDER_FACTORY);
-        Scene scene = FX.loadScene(loader);
-        scene.setFill(Color.TRANSPARENT);
-        stage.setScene(scene);
-        stage.getIcons().add(FX.image("ico.png"));
-        FX.stageDrag(scene,stage);
-        return loader.getController();
+        try {
+            Stage stage = new Stage(StageStyle.TRANSPARENT);
+            FXMLLoader loader = FX.fxmlLoader("serialPortView.fxml");
+            loader.setBuilderFactory(JAVAFX_BUILDER_FACTORY);
+            Scene scene = FX.loadScene(loader); // 这里最容易报错
+            scene.setFill(Color.TRANSPARENT);
+            stage.setScene(scene);
+            stage.getIcons().add(FX.image("ico.png"));
+            FX.stageDrag(scene, stage);
+            return loader.getController();
+        } catch (Exception e) {
+            System.err.println("--- FXML 加载失败详细日志开始 ---");
+            e.printStackTrace(); // 关键：打印完整堆栈
+            System.err.println("--- FXML 加载失败详细日志结束 ---");
+            throw e;
+        }
     }
 
     /**
