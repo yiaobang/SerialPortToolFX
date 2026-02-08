@@ -130,6 +130,11 @@ public class SerialPortView extends ViewFXML<SerialComm> {
     }
 
     public void updateUITexts() {
+        // 1. 先解除旧的绑定
+        serialPortSwitch.textProperty().unbind();
+        // 2. 重新绑定（这会强制使用新的 Locale 重新读取 I18nUtils.getString）
+        serialPortSwitch.textProperty().bind(viewModel.getSerialPortState().map(state ->
+                I18nUtils.getString(state ? "button.close_serial_port" : "button.open_serial_port")));
         // 1. 刷新普通控件文本
         receiveShow.setText(I18nUtils.getString("checkbox.receive_display"));
         receiveSave.setText(I18nUtils.getString("checkbox.record_receive_data"));

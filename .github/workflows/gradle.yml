@@ -101,10 +101,9 @@ jobs:
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
           body: |
-            ## SerialPortToolFX v${{ github.ref_name }}
-            - 全新 AtlantaFX 卡片式精致布局
+            ## SerialPortToolFX ${{ github.ref_name }}
+            - 全新卡片式精致布局
             - 适配中、英、日三语显示
-            - 修复 Java 25 运行权限问题
           files: final-dist/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
