@@ -150,11 +150,11 @@
    <HBox layoutY="646.0" prefHeight="34.0" spacing="0.0" styleClass="status-bar-row" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
       <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
          <Label fx:id="sendLabel" alignment="CENTER" prefHeight="34.0" prefWidth="80.0" styleClass="status-title" text="发送:" />
-         <Label fx:id="sendNumber" alignment="CENTER" maxWidth="Infinity" prefHeight="34.0" styleClass="status-num-tx" text="0" HBox.hgrow="ALWAYS" />
+         <Label fx:id="sendNumber" alignment="CENTER" maxWidth="Infinity" onMouseClicked="#cleanSendNumber" prefHeight="34.0" styleClass="status-num-tx" text="0" HBox.hgrow="ALWAYS" />
       </HBox>
       <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
          <Label fx:id="receiveLabel" alignment="CENTER" prefHeight="34.0" prefWidth="80.0" styleClass="status-title" text="接收:" />
-         <Label fx:id="receiveNumber" alignment="CENTER" maxWidth="Infinity" prefHeight="34.0" styleClass="status-num-rx" text="0" HBox.hgrow="ALWAYS" />
+         <Label fx:id="receiveNumber" alignment="CENTER" maxWidth="Infinity" onMouseClicked="#cleanReceiveNumber" prefHeight="34.0" styleClass="status-num-rx" text="0" HBox.hgrow="ALWAYS" />
       </HBox>
    </HBox>
 </AnchorPane>

@@ -22,16 +22,16 @@ jobs:
       - name: Checkout project
         uses: actions/checkout@v4
 
-      - name: Set up JDK 25
+      - name: Set up JDK 26
         uses: actions/setup-java@v4
         with:
-          java-version: '25'
+          java-version: '26'
           distribution: 'zulu'
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: '9.3.1'
+          gradle-version: '9.4.0'
 
       - name: Grant execute permission
         if: runner.os != 'Windows'
@@ -102,8 +102,7 @@ jobs:
           name: Release ${{ github.ref_name }}
           body: |
             ## SerialPortToolFX ${{ github.ref_name }}
-            - 全新卡片式精致布局
-            - 适配中、英、日三语显示
+              ${{ github.event.head_commit.message }}
           files: final-dist/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -11,6 +11,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleLongProperty;
 import lombok.Getter;
 import lombok.Setter;
+
 import java.io.File;
 
 @Getter
@@ -18,13 +19,18 @@ public final class SerialComm implements ViewModel, AutoCloseable {
     private static final int MAX_SHOW_BYTES = 115200;
     private final ByteBuffer buffer = new ByteBuffer(MAX_SHOW_BYTES);
 
-    @Setter private DeviceSimulator deviceSimulator;
-    @Setter private volatile long waitTime = 1000;
+    @Setter
+    private DeviceSimulator deviceSimulator;
+    @Setter
+    private volatile long waitTime = 1000;
     private DataWriteFile dataWriteFile;
 
-    @Setter private volatile boolean sendSave;
-    @Setter private volatile boolean receiveSave;
-    @Setter private volatile boolean receiveShow = true;
+    @Setter
+    private volatile boolean sendSave;
+    @Setter
+    private volatile boolean receiveSave;
+    @Setter
+    private volatile boolean receiveShow = true;
 
     private final SimpleLongProperty SEND_LONG_PROPERTY = new SimpleLongProperty(0);
     private final SimpleLongProperty RECEIVE_LONG_PROPERTY = new SimpleLongProperty(0);
@@ -94,9 +100,21 @@ public final class SerialComm implements ViewModel, AutoCloseable {
         openSerialPort();
     }
 
-    public void setSerialPortName(String name) { this.serialPortName = name; openSerialPort(); }
-    public void setBaudRate(int val) { this.baudRate = val; openSerialPort(); }
-    public void setDataBits(int val) { this.dataBits = val; openSerialPort(); }
+    public void setSerialPortName(String name) {
+        this.serialPortName = name;
+        openSerialPort();
+    }
+
+    public void setBaudRate(int val) {
+        this.baudRate = val;
+        openSerialPort();
+    }
+
+    public void setDataBits(int val) {
+        this.dataBits = val;
+        openSerialPort();
+    }
+
     public void setStopBits(String val) {
         this.stopString = val;
         this.stopBits = switch (val) {
@@ -112,8 +130,11 @@ public final class SerialComm implements ViewModel, AutoCloseable {
             int num = serialPort.writeBytes(bytes, bytes.length);
             if (num > 0) {
                 FX.run(() -> SEND_LONG_PROPERTY.set(SEND_LONG_PROPERTY.get() + num));
-                if (sendSave && dataWriteFile != null) Thread.startVirtualThread(() -> dataWriteFile.serialCommSend(bytes));
-            } else { close(); }
+                if (sendSave && dataWriteFile != null)
+                    Thread.startVirtualThread(() -> dataWriteFile.serialCommSend(bytes));
+            } else {
+                close();
+            }
             return num;
         }
         return 0;
@@ -121,14 +142,23 @@ public final class SerialComm implements ViewModel, AutoCloseable {
 
     public void listen(byte[] bytes) {
         FX.run(() -> RECEIVE_LONG_PROPERTY.set(RECEIVE_LONG_PROPERTY.get() + bytes.length));
-        if (receiveSave && dataWriteFile != null) Thread.startVirtualThread(() -> dataWriteFile.serialCommReceive(bytes));
+        if (receiveSave && dataWriteFile != null)
+            Thread.startVirtualThread(() -> dataWriteFile.serialCommReceive(bytes));
         if (receiveShow) buffer.add(bytes);
         if (deviceSimulator != null) deviceSimulator.checkData(bytes);
     }
 
-    public byte[] getData() { return buffer.getBuffer(); }
-    public void clearSend() { FX.run(() -> SEND_LONG_PROPERTY.set(0)); }
-    public void clearReceive() { FX.run(() -> RECEIVE_LONG_PROPERTY.set(0)); }
+    public byte[] getData() {
+        return buffer.getBuffer();
+    }
+
+    public void clearSend() {
+        FX.run(() -> SEND_LONG_PROPERTY.set(0));
+    }
+
+    public void clearReceive() {
+        FX.run(() -> RECEIVE_LONG_PROPERTY.set(0));
+    }
 
     public boolean createDeviceSimulator(File file) {
         if (this.deviceSimulator != null) this.deviceSimulator.close();

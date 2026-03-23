@@ -3,38 +3,39 @@ plugins {
     id('application')
     id('org.javamodularity.moduleplugin') version '2.0.0'
     id('org.openjfx.javafxplugin') version '0.1.0'
-    id('org.beryx.jlink') version '3.2.1'
+    id('org.beryx.jlink') version '4.0.0-rc'//'3.2.1'
 }
 
 group = 'com.yiaobang'
 version = '2.0.0'
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_25
-    targetCompatibility = JavaVersion.VERSION_25
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(26)
+    }
 }
 
 repositories {
     mavenLocal()
-    maven { url = 'https://maven.aliyun.com/repository/public/' }
     mavenCentral()
+    maven { url = 'https://maven.aliyun.com/repository/public/' }
     maven { url = 'https://jitpack.io' }
 }
 
 javafx {
-    version = '25.0.2'
+    version = '26'
     modules = ['javafx.controls', 'javafx.fxml']
 }
 
 
 dependencies {
-    compileOnly 'org.projectlombok:lombok:1.18.42'
-    annotationProcessor 'org.projectlombok:lombok:1.18.42'
+    compileOnly 'org.projectlombok:lombok:1.18.44'
+    annotationProcessor 'org.projectlombok:lombok:1.18.44'
     implementation 'io.github.mkpaz:atlantafx-base:2.1.0'
     implementation 'com.typesafe:config:1.4.5'
     implementation 'com.fazecast:jSerialComm:2.11.4'
-    implementation 'org.apache.commons:commons-text:1.14.0'
-    implementation 'commons-codec:commons-codec:1.19.0'
+    implementation 'org.apache.commons:commons-text:1.15.0'
+    implementation 'commons-codec:commons-codec:1.21.0'
     implementation 'com.google.code.gson:gson:2.13.2'
 
     testImplementation platform('org.junit:junit-bom:5.12.1')

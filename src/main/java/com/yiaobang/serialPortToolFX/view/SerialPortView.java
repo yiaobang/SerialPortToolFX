@@ -3,8 +3,8 @@ package com.yiaobang.serialporttoolfx.view;
 import com.yiaobang.serialporttoolfx.framework.core.FX;
 import com.yiaobang.serialporttoolfx.framework.mvvm.ViewFXML;
 import com.yiaobang.serialporttoolfx.framework.theme.Theme;
-import com.yiaobang.serialporttoolfx.serial.SerialComm;
 import com.yiaobang.serialporttoolfx.serial.PortMonitor;
+import com.yiaobang.serialporttoolfx.serial.SerialComm;
 import com.yiaobang.serialporttoolfx.utils.CodeFormat;
 import com.yiaobang.serialporttoolfx.utils.I18nUtils;
 import javafx.animation.KeyFrame;
@@ -31,16 +31,26 @@ import static com.yiaobang.serialporttoolfx.AppLauncher.FILE_CHOOSER;
 import static com.yiaobang.serialporttoolfx.AppLauncher.JAVAFX_BUILDER_FACTORY;
 
 public class SerialPortView extends ViewFXML<SerialComm> {
-    @FXML private AnchorPane root;
-    @FXML private ComboBox<String> serialPortNamePicker, stopBitsPicker, parityPicker, flowControlPicker;
-    @FXML private ComboBox<Integer> baudRatePicker, dataBitsPicker;
-    @FXML private CheckBox hexReceive, hexSend, receiveSave, sendSave, receiveShow, timedDispatch;
-    @FXML private TextArea receive, send;
-    @FXML private Label receiveNumber, sendNumber, sendLabel, receiveLabel, frequencyLabel, msLabel;
-    @FXML private Label serialPortLabel, baudRateLabel, dataBitsLabel, stopBitsLabel, parityLabel, flowControlLabel, linkStatusLabel, simStatusLabel;
-    @FXML private Circle serialPortLight, analogLight;
-    @FXML private Button serialPortSwitch, clearReceiveBtn, sendDataBtn, clearSendBtn, newWindowBtn, analogReplyBtn;
-    @FXML private TextField time;
+    @FXML
+    private AnchorPane root;
+    @FXML
+    private ComboBox<String> serialPortNamePicker, stopBitsPicker, parityPicker, flowControlPicker;
+    @FXML
+    private ComboBox<Integer> baudRatePicker, dataBitsPicker;
+    @FXML
+    private CheckBox hexReceive, hexSend, receiveSave, sendSave, receiveShow, timedDispatch;
+    @FXML
+    private TextArea receive, send;
+    @FXML
+    private Label receiveNumber, sendNumber, sendLabel, receiveLabel, frequencyLabel, msLabel;
+    @FXML
+    private Label serialPortLabel, baudRateLabel, dataBitsLabel, stopBitsLabel, parityLabel, flowControlLabel, linkStatusLabel, simStatusLabel;
+    @FXML
+    private Circle serialPortLight, analogLight;
+    @FXML
+    private Button serialPortSwitch, clearReceiveBtn, sendDataBtn, clearSendBtn, newWindowBtn, analogReplyBtn;
+    @FXML
+    private TextField time;
 
     private final Timeline circularSending = new Timeline();
     private volatile long waitTime = 1000;
@@ -49,7 +59,9 @@ public class SerialPortView extends ViewFXML<SerialComm> {
     private boolean isUpdatingI18n = false; // 锁，防止刷新列表触发重连
 
     @Override
-    protected SerialComm createViewModel() { return new SerialComm(); }
+    protected SerialComm createViewModel() {
+        return new SerialComm();
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -111,22 +123,31 @@ public class SerialPortView extends ViewFXML<SerialComm> {
         timedDispatch.selectedProperty().addListener((o, old, n) -> {
             if (n) {
                 circularSending.getKeyFrames().setAll(new KeyFrame(Duration.millis(waitTime), e -> {
-                    if (viewModel.write(bytes) < 1) { circularSending.stop(); timedDispatch.setSelected(false); }
+                    if (viewModel.write(bytes) < 1) {
+                        circularSending.stop();
+                        timedDispatch.setSelected(false);
+                    }
                 }));
                 circularSending.play();
-            } else { circularSending.stop(); }
+            } else {
+                circularSending.stop();
+            }
         });
 
         // 输入监听
-        send.textProperty().addListener((o, old, n) -> updateSendBytes());
+        send.textProperty().addListener((_, _, _) -> updateSendBytes());
         hexSend.selectedProperty().addListener((o, old, n) -> updateSendBytes());
         time.textProperty().addListener((o, old, n) -> {
-            try { waitTime = Math.max(1, Long.parseLong(n)); viewModel.setWaitTime(waitTime); }
-            catch (Exception e) { time.setText(old); }
+            try {
+                waitTime = Math.max(1, Long.parseLong(n));
+                viewModel.setWaitTime(waitTime);
+            } catch (Exception e) {
+                time.setText(old);
+            }
         });
 
-        receiveSave.selectedProperty().addListener((o, old, n) -> viewModel.setReceiveSave(n));
-        sendSave.selectedProperty().addListener((o, old, n) -> viewModel.setSendSave(n));
+        receiveSave.selectedProperty().addListener((_, _, n) -> viewModel.setReceiveSave(n));
+        sendSave.selectedProperty().addListener((_, _, n) -> viewModel.setSendSave(n));
     }
 
     public void updateUITexts() {
@@ -185,37 +206,110 @@ public class SerialPortView extends ViewFXML<SerialComm> {
 
     private void updateSendBytes() {
         String t = send.getText();
-        if (t == null || t.isEmpty()) { bytes = null; }
-        else { bytes = hexSend.isSelected() ? CodeFormat.hex(t) : CodeFormat.utf8(t); }
+        if (t == null || t.isEmpty()) {
+            bytes = null;
+        } else {
+            bytes = hexSend.isSelected() ? CodeFormat.hex(t) : CodeFormat.utf8(t);
+        }
     }
 
-    @FXML void min() { ((Stage) root.getScene().getWindow()).setIconified(true); }
-    @FXML void close() { ((Stage) root.getScene().getWindow()).close(); viewModel.close(); }
-    @FXML void switchLanguage() {
+    @FXML
+    void min() {
+        ((Stage) root.getScene().getWindow()).setIconified(true);
+    }
+
+    @FXML
+    void close() {
+        ((Stage) root.getScene().getWindow()).close();
+        viewModel.close();
+    }
+
+    @FXML
+    void switchLanguage() {
         Locale[] locales = I18nUtils.getSupportedLocales();
         int next = 0;
-        for(int i=0; i<locales.length; i++) {
-            if(locales[i].equals(I18nUtils.getCurrentLocale())) { next = (i+1)%locales.length; break; }
+        for (int i = 0; i < locales.length; i++) {
+            if (locales[i].equals(I18nUtils.getCurrentLocale())) {
+                next = (i + 1) % locales.length;
+                break;
+            }
         }
         I18nUtils.setLocale(locales[next]);
         updateUITexts();
     }
-    @FXML void switchTheme() { theme++; root.getScene().setUserAgentStylesheet(Theme.rotationTheme(theme)); }
-    @FXML void analogReply() {
+
+    @FXML
+    void switchTheme() {
+        theme++;
+        root.getScene().setUserAgentStylesheet(Theme.rotationTheme(theme));
+    }
+
+    @FXML
+    void analogReply() {
         File file = FILE_CHOOSER.showOpenDialog(root.getScene().getWindow());
         analogLight.setFill(viewModel.createDeviceSimulator(file) ? Color.LIME : Color.RED);
     }
-    @FXML void cleanReceive() { viewModel.getBuffer().close(); receive.clear(); }
-    @FXML void cleanSend() { send.clear(); }
-    @FXML void cleanReceiveNumber() { viewModel.clearReceive(); }
-    @FXML void cleanSendNumber() { viewModel.clearSend(); }
-    @FXML void sendData() { viewModel.write(bytes); }
-    @FXML void serialPortSwitch() { if (viewModel.getSerialPortState().get()) viewModel.close(); else viewModel.openSerialPort(); }
-    @FXML void createSerialPortStage() {
-        SerialPortView v = createSerialPortView();
-        v.initTheme(this.theme).initSerialPort(viewModel.getBaudRate(), viewModel.getDataBits(), viewModel.getStopString(), "", "");
-        v.getStage().show();
+
+    @FXML
+    void cleanReceive() {
+        viewModel.getBuffer().close();
+        receive.clear();
     }
+
+    @FXML
+    void cleanSend() {
+        send.clear();
+    }
+
+    @FXML
+    void cleanReceiveNumber() {
+        viewModel.clearReceive();
+    }
+
+    @FXML
+    void cleanSendNumber() {
+        viewModel.clearSend();
+    }
+
+    @FXML
+    void sendData() {
+        viewModel.write(bytes);
+    }
+
+    @FXML
+    void serialPortSwitch() {
+        if (viewModel.getSerialPortState().get()) viewModel.close();
+        else viewModel.openSerialPort();
+    }
+
+    @FXML
+    void createSerialPortStage() {
+        SerialPortView v = createSerialPortView();
+        // 获取当前校验位和流控的索引
+        int parityIndex = this.parityPicker.getSelectionModel().getSelectedIndex();
+        int flowControlIndex = this.flowControlPicker.getSelectionModel().getSelectedIndex();
+        v.initTheme(this.theme).initSerialPort(viewModel.getBaudRate(), viewModel.getDataBits(), viewModel.getStopString(), parityIndex, flowControlIndex);
+        //当前窗口位置
+        Stage current = (Stage) root.getScene().getWindow();
+        //设置新的窗口位置
+        Stage stage = v.getStage();
+        stage.setX(current.getX() + 30);
+        stage.setY(current.getY() + 30);
+        stage.show();
+    }
+
+    public void initSerialPort(int b, int d, String s, int parityIndex, int flowControlIndex) {
+        baudRatePicker.setValue(b);
+        dataBitsPicker.setValue(d);
+        stopBitsPicker.setValue(s);
+        if (parityIndex >= 0) {
+            parityPicker.getSelectionModel().select(parityIndex);
+        }
+        if (flowControlIndex >= 0) {
+            flowControlPicker.getSelectionModel().select(flowControlIndex);
+        }
+    }
+
     public static SerialPortView createSerialPortView() {
         Stage s = new Stage(StageStyle.TRANSPARENT);
         FXMLLoader l = FX.fxmlLoader("serialPortView.fxml");
@@ -226,9 +320,15 @@ public class SerialPortView extends ViewFXML<SerialComm> {
         FX.stageDrag(sc, s);
         return l.getController();
     }
-    public SerialPortView initTheme(int t) { this.theme = t; switchTheme(); return this; }
-    public void initSerialPort(int b, int d, String s, String p, String f) {
-        baudRatePicker.setValue(b); dataBitsPicker.setValue(d); stopBitsPicker.setValue(s);
+
+    public SerialPortView initTheme(int t) {
+        this.theme = t;
+        switchTheme();
+        return this;
     }
-    public Stage getStage() { return (Stage) root.getScene().getWindow(); }
+
+    public Stage getStage() {
+        return (Stage) root.getScene().getWindow();
+    }
+
 }
